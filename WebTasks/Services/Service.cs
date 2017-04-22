@@ -1,8 +1,4 @@
 ﻿using Microsoft.AspNet.Identity.EntityFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using WebTasks.Models;
 
 namespace WebTasks.Services
@@ -10,7 +6,9 @@ namespace WebTasks.Services
     public class Service
     {
         private ApplicationDbContext context;
+
         private ApplicationUserManager userManager;
+
         protected Service()
         {
             this.context = new ApplicationDbContext();
@@ -20,5 +18,15 @@ namespace WebTasks.Services
         protected ApplicationDbContext Context => this.context;
 
         protected ApplicationUserManager UserManager => this.userManager;
+
+        public System.Threading.Tasks.Task SaveChangesAsync()
+        {
+            return this.Context.SaveChangesAsync();
+        }
+
+        public void DisposeContext()
+        {
+            this.Context.Dispose();
+        }
     }
 }

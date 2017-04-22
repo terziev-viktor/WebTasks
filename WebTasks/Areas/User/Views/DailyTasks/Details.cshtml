@@ -10,6 +10,10 @@
     <h4>DailyTask</h4>
     <hr />
     <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
         <dd>
             @Html.DisplayFor(model => model.Title)
         </dd>
@@ -19,12 +23,25 @@
         </dt>
 
         <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Creator_Name)
+        </dt>
+
+        <dd>
             @Html.DisplayFor(model => model.Creator_Name)
         </dd>
 
         <dt>
             @Html.DisplayNameFor(model => model.CommentsCount)
         </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CommentsCount)
+        </dd>
+
     </dl>
 </div>
 <p>

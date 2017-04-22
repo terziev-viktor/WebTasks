@@ -6,6 +6,8 @@ using WebTasks.Models.EntityModels;
 using WebTasks.Models.BindingModels;
 using AutoMapper;
 using WebTasks.Services;
+using WebTasks.Models.ViewModels;
+using System.Collections.Generic;
 
 namespace WebTasks.Areas.User.Controllers
 {
@@ -22,11 +24,12 @@ namespace WebTasks.Areas.User.Controllers
         public ActionResult Index()
         {
             ViewBag.Header = "Your daily tasks";
-            var tasksVm = this.service.GetUserDailyTasksVm(this.User.Identity.Name);
+            IEnumerable<DailyTaskVm> tasksVm = this.service.GetUserDailyTasksVm(this.User.Identity.Name);
             return View(tasksVm);
         }
 
         // GET: User/DailyTasks/Details/5
+        [HttpGet]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -35,7 +38,7 @@ namespace WebTasks.Areas.User.Controllers
             }
 
             var vm = this.service.GetDetailedDailyTaskVm(id);
-
+            
             if(vm == null)
             {
                 return this.HttpNotFound();
@@ -51,8 +54,6 @@ namespace WebTasks.Areas.User.Controllers
         }
 
         // POST: User/DailyTasks/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Note,Deadline,Title,Description")] DailyTaskBm bm)
@@ -91,9 +92,7 @@ namespace WebTasks.Areas.User.Controllers
         {
             if (ModelState.IsValid)
             {
-                DailyTask dt = Mapper.Instance.Map<DailyTaskBm, DailyTask>(bm);
-                this.service.SetEntryState(dt, EntityState.Modified);
-                await this.service.SaveChangesAsync();
+                await this.service.Edit(bm.Id, bm.Note, bm.Title, bm.Description, bm.Deadline);
                 return RedirectToAction("Index");
             }
             return View(bm);

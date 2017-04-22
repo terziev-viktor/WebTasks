@@ -1,26 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
+﻿using System.Data.Entity;
 using System.Threading.Tasks;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using WebTasks.Models;
 using WebTasks.Models.EntityModels;
+using WebTasks.Services;
+using WebTasks.Areas.User.Models.ViewModels;
+using WebTasks.Models.BindingModels;
+using WebTasks.Models.ViewModels;
 
 namespace WebTasks.Areas.User.Controllers
 {
     [Authorize]
     public class ProjectsController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private ProjectsService service;
+
+        public ProjectsController()
+        {
+            this.service = new ProjectsService();
+        }
 
         // GET: User/Projects
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            return View(await db.Projects.ToListAsync());
+            return View(this.service.GetProjectsToList());
         }
 
         // GET: User/Projects/Details/5
@@ -30,12 +33,16 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await db.Projects.FindAsync(id);
-            if (project == null)
+            Project p = await this.service.FindProjectAsync(id);
+
+            if (p == null)
             {
                 return HttpNotFound();
             }
-            return View(project);
+
+            ProjectDetailedVm vm = this.service.GetDetailedVm(p);
+
+            return View(vm);
         }
 
         // GET: User/Projects/Create
@@ -45,20 +52,19 @@ namespace WebTasks.Areas.User.Controllers
         }
 
         // POST: User/Projects/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,ReleaseDate,Plan,Title,Description")] Project project)
+        public async Task<ActionResult> Create([Bind(Include = "ReleaseDate,Title")] ProjectBm bm)
         {
             if (ModelState.IsValid)
             {
-                db.Projects.Add(project);
-                await db.SaveChangesAsync();
+                this.service.AddProject(bm);
+                
+                await this.service.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
-            return View(project);
+            return View(bm);
         }
 
         // GET: User/Projects/Edit/5
@@ -68,28 +74,31 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await db.Projects.FindAsync(id);
+            Project project = await service.FindProjectAsync(id);
             if (project == null)
             {
                 return HttpNotFound();
             }
-            return View(project);
+
+            ProjectVm vm = this.service.GetProjectVm(project);
+
+            return View(vm);
         }
 
         // POST: User/Projects/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Title,Description")] Project project)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Title,Description")] ProjectBm bm)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(project).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                Project p = await this.service.FindProjectAsync(bm.Id);
+                this.service.UpdateProject(p, bm.ReleaseDate, bm.Plan, bm.Title, bm.Description);
+                this.service.SetEntryState(p, EntityState.Modified);
+                await this.service.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            return View(project);
+            return View(bm);
         }
 
         // GET: User/Projects/Delete/5
@@ -99,12 +108,14 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await db.Projects.FindAsync(id);
-            if (project == null)
+            Project p = await this.service.FindProjectAsync(id);
+            if (p == null)
             {
                 return HttpNotFound();
             }
-            return View(project);
+            ProjectVm vm = this.service.GetProjectVm(p);
+
+            return View(vm);
         }
 
         // POST: User/Projects/Delete/5
@@ -112,9 +123,9 @@ namespace WebTasks.Areas.User.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Project project = await db.Projects.FindAsync(id);
-            db.Projects.Remove(project);
-            await db.SaveChangesAsync();
+            Project project = await this.service.FindProjectAsync(id);
+            this.service.RemoveProject(project);
+            await this.service.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
@@ -122,7 +133,7 @@ namespace WebTasks.Areas.User.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                this.service.DisposeContext();
             }
             base.Dispose(disposing);
         }

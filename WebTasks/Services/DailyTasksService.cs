@@ -26,8 +26,11 @@ namespace WebTasks.Services
                         b.Creator_Name = a.Creator.UserName;
                     });
                 x.CreateMap<DailyTask, DailyTaskVm>();
+                x.CreateMap<DailyTaskBm, DailyTask>();
+                x.CreateMap<Comment, CommentVm>();
             });
         }
+
         internal IEnumerable<DailyTaskVm> GetUserDailyTasksVm(string name)
         {
             var currentUser = this.UserManager.Users.First(x => x.UserName == name);
@@ -42,16 +45,17 @@ namespace WebTasks.Services
             return this.Context.DailyTasks.Find(id);
         }
 
+        // TODO: 
         internal DailyTaskDetailedVm GetDetailedDailyTaskVm(int? id)
         {
             DailyTask dailyTask = this.Context.DailyTasks.Find(id);
-
+            
             if (dailyTask == null)
             {
                 return null;
             }
             DailyTaskDetailedVm vm = Mapper.Map<DailyTaskDetailedVm>(dailyTask);
-
+            
             return vm;
         }
 
@@ -70,24 +74,30 @@ namespace WebTasks.Services
             return this.Context.DailyTasks.FindAsync(id);
         }
 
-        internal void SetEntryState(DailyTask dt, EntityState modified)
+        internal void SetEntryState(DailyTask dt, EntityState m)
         {
-            this.Context.Entry(dt).State = EntityState.Modified;
+            this.Context.Entry(dt).State = m;
         }
-
-        internal System.Threading.Tasks.Task SaveChangesAsync()
-        {
-            return this.Context.SaveChangesAsync();
-        }
-
-        internal void DisposeContext()
-        {
-            this.Context.Dispose();
-        }
-
+        
         internal void Remove(DailyTask dailyTask)
         {
             this.Context.DailyTasks.Remove(dailyTask);
+        }
+
+        internal async System.Threading.Tasks.Task Edit(int id, string note, string title, string description, DateTime deadline)
+        {
+            DailyTask dt = this.Context.DailyTasks.Find(id);
+            dt.Title = title;
+            dt.Description = description;
+            dt.Note = dt.Note;
+            dt.Deadline = deadline;
+            await this.SaveChangesAsync();
+        }
+
+        internal DailyTask GetDailyTask(DailyTaskBm bm)
+        {
+            return Mapper.Instance.Map<DailyTaskBm, DailyTask>(bm);
+
         }
     }
 }
