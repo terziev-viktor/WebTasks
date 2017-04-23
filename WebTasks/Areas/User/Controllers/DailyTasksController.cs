@@ -38,8 +38,8 @@ namespace WebTasks.Areas.User.Controllers
             }
 
             var vm = this.service.GetDetailedDailyTaskVm(id);
-            
-            if(vm == null)
+
+            if (vm == null)
             {
                 return this.HttpNotFound();
             }
@@ -74,7 +74,7 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            
+
             DailyTask dailyTask = await this.service.FindDailyTaskById(id);
 
             if (dailyTask == null)
@@ -93,7 +93,7 @@ namespace WebTasks.Areas.User.Controllers
             if (ModelState.IsValid)
             {
                 await this.service.Edit(bm.Id, bm.Note, bm.Title, bm.Description, bm.Deadline);
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { id = bm.Id});
             }
             return View(bm);
         }

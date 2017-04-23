@@ -24,6 +24,11 @@ namespace WebTasks.Services
             return this.Context.SaveChangesAsync();
         }
 
+        public void SaveChanges()
+        {
+            this.context.SaveChanges();
+        }
+
         public void DisposeContext()
         {
             this.Context.Dispose();

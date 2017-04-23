@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using WebTasks.Areas.User.Models.ViewModels;
 using WebTasks.Models.EntityModels;
 using WebTasks.Models.ViewModels;
@@ -27,7 +26,10 @@ namespace WebTasks.Services
                     });
                 x.CreateMap<DailyTask, DailyTaskVm>();
                 x.CreateMap<DailyTaskBm, DailyTask>();
-                x.CreateMap<Comment, CommentVm>();
+                x.CreateMap<Comment, CommentVm>().AfterMap((a, b) =>
+                {
+                    b.Author = a.Author.UserName;
+                });
             });
         }
 
@@ -44,8 +46,7 @@ namespace WebTasks.Services
         {
             return this.Context.DailyTasks.Find(id);
         }
-
-        // TODO: 
+        
         internal DailyTaskDetailedVm GetDetailedDailyTaskVm(int? id)
         {
             DailyTask dailyTask = this.Context.DailyTasks.Find(id);
@@ -55,7 +56,7 @@ namespace WebTasks.Services
                 return null;
             }
             DailyTaskDetailedVm vm = Mapper.Map<DailyTaskDetailedVm>(dailyTask);
-            
+
             return vm;
         }
 

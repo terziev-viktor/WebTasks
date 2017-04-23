@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Daily Task Details";
 }
+@Scripts.Render("~/bundles/comments")
 
 <h2>Details</h2>
 
@@ -41,10 +42,40 @@
         <dd>
             @Html.DisplayFor(model => model.CommentsCount)
         </dd>
-
     </dl>
 </div>
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
+
+<h3>Write a comment</h3>
+<div id="comments-panel" class="panel panel-default">
+    <div class="panel-body">
+        <textarea id="txtarea-comment"></textarea>
+        <div class="btn-group">
+            <button class="btn btn-default" onclick="post(@Model.Id)">Post</button>
+            <button class="btn btn-default" onclick="clear()">Clear</button>
+        </div>
+    </div>
+</div>
+
+@foreach (var item in Model.Comments)
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span>@item.Author</span>
+            <span class="pull-right">@item.PublishDate.ToLongDateString()</span>
+        </div>
+        <div class="panel-body">
+            <p>@item.Content</p>
+        </div>
+    </div>
+}
+@if (Model.CommentsCount > 0)
+{
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

@@ -49,14 +49,46 @@ namespace WebTasks.Migrations
             var userU = userManager.Users.FirstOrDefault(x => x.Email == "user@user.net");
             userManager.AddToRole(userU.Id, "User");
 
-            context.DailyTasks.Add(new Models.EntityModels.DailyTask()
+            var dtask1 = new Models.EntityModels.DailyTask()
             {
                 Title = "Task1",
                 Note = "this is the first task",
                 Description = "Has no desc",
                 Deadline = DateTime.Now,
                 Creator = context.Users.First(x => x.UserName == "user@user.net")
+            };
+            dtask1.Comments.Add(new Models.EntityModels.Comment()
+            {
+                Author = userManager.Users.First(),
+                PublishDate = DateTime.Now,
+                Content = "In up so discovery my " +
+                "middleton eagerness dejection explained. " +
+                "Estimating excellence ye contrasted insensible as. " +
+                "Oh up unsatiable advantages decisively as at interested. Present suppose in esteems in demesne colonel it to. " +
+                "End horrible she landlord screened stanhill. Repeated offended you opinions off dissuade ask packages screened. ",
             });
+            dtask1.Comments.Add(new Models.EntityModels.Comment()
+            {
+                Author = userManager.Users.First(),
+                PublishDate = DateTime.Now,
+                Content = "In up so discovery my " +
+                "middleton eagerness dejection explained. " +
+                "Estimating excellence ye contrasted insensible as. " +
+                "Oh up unsatiable advantages decisively as at interested. Present suppose in esteems in demesne colonel it to. " +
+                "End horrible she landlord screened stanhill. Repeated offended you opinions off dissuade ask packages screened. ",
+            });
+            dtask1.Comments.Add(new Models.EntityModels.Comment()
+            {
+                Author = userManager.Users.First(),
+                PublishDate = DateTime.Now,
+                Content = "In up so discovery my " +
+                "middleton eagerness dejection explained. " +
+                "Estimating excellence ye contrasted insensible as. " +
+                "Oh up unsatiable advantages decisively as at interested. Present suppose in esteems in demesne colonel it to. " +
+                "End horrible she landlord screened stanhill. Repeated offended you opinions off dissuade ask packages screened. ",
+            });
+
+            context.DailyTasks.Add(dtask1);
 
             context.DailyTasks.Add(new Models.EntityModels.DailyTask()
             {
@@ -102,6 +134,8 @@ namespace WebTasks.Migrations
                 Deadline = DateTime.Now,
                 Creator = context.Users.First(x => x.UserName == "user@user.net")
             });
+
+            context.SaveChanges();
         }
     }
 }

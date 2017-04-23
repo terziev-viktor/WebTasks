@@ -59,7 +59,7 @@ namespace WebTasks.Areas.User.Controllers
             if (ModelState.IsValid)
             {
                 this.service.AddProject(bm);
-                
+
                 await this.service.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
