@@ -17,11 +17,31 @@
         },
         success: (result) => {
             $("#comments-panel").after(result);
+            $('#txtarea-comment').val('');
         }
     });
 }
 
-function clear() {
+function clearTxtArea() {
     $('#txtarea-comment').val('');
     console.log('clicked');
+}
+
+function deleteTask(id) {
+    $.ajax({
+        method: "DELETE",
+        url: "/Comments/Delete",
+        data: {
+            TaskId: id
+        },
+        statusCode: {
+            200: () => {
+                $("#comment-" + id).remove();
+            },
+            401: () => {
+                // TODO: use noty
+                alert("You are Unauthorized to perform this action");
+            }
+        }
+    })
 }

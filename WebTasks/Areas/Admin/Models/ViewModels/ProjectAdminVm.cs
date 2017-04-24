@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace WebTasks.Models.ViewModels
+namespace WebTasks.Areas.Admin.Models.ViewModels
 {
-    public class ProjectVm
+    public class ProjectAdminVm
     {
         public int Id { get; set; }
 
@@ -15,5 +15,7 @@ namespace WebTasks.Models.ViewModels
         public DateTime ReleaseDate { get; set; }
 
         public string Plan { get; set; }
+
+        public string Creator { get; set; }
     }
 }

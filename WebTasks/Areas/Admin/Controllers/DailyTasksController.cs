@@ -1,41 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using WebTasks.Models;
 using WebTasks.Models.EntityModels;
+using WebTasks.Services;
+using WebTasks.Areas.Admin.Models.ViewModels;
+using WebTasks.Models.BindingModels;
 
 namespace WebTasks.Areas.Admin.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class DailyTasksController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-
+        private readonly DailyTasksService service = new DailyTasksService();
         // GET: Admin/DailyTasks
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            return View(await db.DailyTasks.ToListAsync());
+            IEnumerable<DailyTaskAdimVm> data = this.service.GetAllDailyTaskVm();
+            return View(data);
         }
 
         // GET: Admin/DailyTasks/Details/5
-        public async Task<ActionResult> Details(int? id)
+        public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            DailyTask dailyTask = await db.DailyTasks.FindAsync(id);
-            if (dailyTask == null)
+            DailyTaskDetailedAdminVm vm = this.service.GetDetailedDailyTaskAdminVmAsync(id);
+            
+            if (vm == null)
             {
                 return HttpNotFound();
             }
-            return View(dailyTask);
+
+            return View(vm);
         }
 
         // GET: Admin/DailyTasks/Create
@@ -49,16 +48,15 @@ namespace WebTasks.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTask dailyTask)
+        public async Task<ActionResult> Create([Bind(Include = "Note,Deadline,Title,Description")] DailyTaskBm bm)
         {
             if (ModelState.IsValid)
             {
-                db.DailyTasks.Add(dailyTask);
-                await db.SaveChangesAsync();
+                await this.service.CreateNewTask(bm, this.User.Identity.Name);
                 return RedirectToAction("Index");
             }
 
-            return View(dailyTask);
+            return View(bm);
         }
 
         // GET: Admin/DailyTasks/Edit/5
@@ -68,7 +66,7 @@ namespace WebTasks.Areas.Admin.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            DailyTask dailyTask = await db.DailyTasks.FindAsync(id);
+            DailyTask dailyTask = await this.service.FindDailyTaskById(id);
             if (dailyTask == null)
             {
                 return HttpNotFound();
@@ -85,9 +83,8 @@ namespace WebTasks.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(dailyTask).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                await this.service.Edit(dailyTask);
+                return RedirectToAction("Details", new { id = dailyTask.Id });
             }
             return View(dailyTask);
         }
@@ -99,7 +96,7 @@ namespace WebTasks.Areas.Admin.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            DailyTask dailyTask = await db.DailyTasks.FindAsync(id);
+            DailyTask dailyTask = await this.service.FindDailyTaskById(id);
             if (dailyTask == null)
             {
                 return HttpNotFound();
@@ -112,9 +109,9 @@ namespace WebTasks.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            DailyTask dailyTask = await db.DailyTasks.FindAsync(id);
-            db.DailyTasks.Remove(dailyTask);
-            await db.SaveChangesAsync();
+            DailyTask dailyTask = await this.service.FindDailyTaskById(id);
+            this.service.Remove(dailyTask);
+            await this.service.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
@@ -122,7 +119,7 @@ namespace WebTasks.Areas.Admin.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                this.service.DisposeContext();
             }
             base.Dispose(disposing);
         }

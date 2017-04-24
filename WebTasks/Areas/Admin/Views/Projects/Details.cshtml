@@ -1,45 +1,45 @@
-﻿@model WebTasks.Models.EntityModels.Project
+﻿@model WebTasks.Areas.Admin.Models.ViewModels.ProjectDetailedAdminVm
 
 @{
     ViewBag.Title = "Details";
 }
+@Scripts.Render("~/bundles/comments")
 
-<h2>Details</h2>
+<h2>Project Details</h2>
 
 <div>
     <h4>Project</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.ReleaseDate)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.ReleaseDate)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Plan)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Plan)
-        </dd>
-
-        <dt>
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.Title)
         </dd>
-
+        <dt>
+            @Html.DisplayNameFor(model => model.ReleaseDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ReleaseDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Plan)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Plan)
+        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Creator)
+        </dt>=
+        <dd>
+            @Html.DisplayFor(model => model.Creator)
         </dd>
 
     </dl>
@@ -48,3 +48,38 @@
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
+
+<h3>Comments</h3>
+<hr />
+<div id="comments-panel" class="panel panel-default">
+    <div class="panel-heading">
+        <span>Write a comment</span>
+    </div>
+    <div class="panel-body">
+        <textarea id="txtarea-comment" style="width: 100%; min-width: 100%; max-width=100%; margin-bottom: 5px;"></textarea>
+        <div class="btn-group">
+            <button class="btn btn-default" onclick="post(@Model.Id)">Post</button>
+            <button class="btn btn-default" onclick="clearTxtArea()">Clear</button>
+        </div>
+    </div>
+</div>
+
+@foreach (var item in Model.Comments)
+{
+    <div id="comment-@item.Id" class="panel panel-default">
+        <div class="panel-heading">
+            <span>@item.Author Published on @item.PublishDate.ToLongDateString()</span>
+            <span class="pull-right"><button class="btn btn-default" onclick="deleteTask(@item.Id)">Delete</button></span>
+        </div>
+        <div class="panel-body">
+            <p>@item.Content</p>
+        </div>
+    </div>
+}
+@if (Model.CommentsCount > 0)
+{
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

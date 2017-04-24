@@ -72,17 +72,17 @@ namespace WebTasks.Controllers
 
         // POST: Comments/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public async System.Threading.Tasks.Task<ActionResult> Delete(int id, FormCollection collection)
         {
             try
             {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
+                if (this.User.IsInRole("Admin"))
+                await this.service.DeleteCommentAsync(id);
+                return new HttpStatusCodeResult(200);
             }
             catch
             {
-                return View();
+                return new HttpStatusCodeResult(401);
             }
         }
     }

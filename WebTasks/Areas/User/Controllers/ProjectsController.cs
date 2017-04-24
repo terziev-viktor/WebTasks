@@ -1,5 +1,4 @@
-﻿using System.Data.Entity;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
 using WebTasks.Models.EntityModels;
@@ -40,7 +39,7 @@ namespace WebTasks.Areas.User.Controllers
                 return HttpNotFound();
             }
 
-            ProjectDetailedVm vm = this.service.GetDetailedVm(p);
+            ProjectDetailedUserVm vm = this.service.GetDetailedVm(p);
 
             return View(vm);
         }
@@ -58,8 +57,7 @@ namespace WebTasks.Areas.User.Controllers
         {
             if (ModelState.IsValid)
             {
-                this.service.AddProject(bm);
-
+                this.service.AddProject(bm, this.User.Identity.Name);
                 await this.service.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -75,6 +73,7 @@ namespace WebTasks.Areas.User.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Project project = await service.FindProjectAsync(id);
+
             if (project == null)
             {
                 return HttpNotFound();
@@ -88,15 +87,13 @@ namespace WebTasks.Areas.User.Controllers
         // POST: User/Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Title,Description")] ProjectBm bm)
+        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id")] ProjectBm bm)
         {
             if (ModelState.IsValid)
             {
                 Project p = await this.service.FindProjectAsync(bm.Id);
-                this.service.UpdateProject(p, bm.ReleaseDate, bm.Plan, bm.Title, bm.Description);
-                this.service.SetEntryState(p, EntityState.Modified);
-                await this.service.SaveChangesAsync();
-                return RedirectToAction("Index");
+                this.service.UpdateProject(p);
+                return RedirectToAction("Details", new { id = bm.Id });
             }
             return View(bm);
         }

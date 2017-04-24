@@ -88,14 +88,14 @@ namespace WebTasks.Areas.User.Controllers
         // POST: User/DailyTasks/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTaskBm bm)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTask dt)
         {
             if (ModelState.IsValid)
             {
-                await this.service.Edit(bm.Id, bm.Note, bm.Title, bm.Description, bm.Deadline);
-                return RedirectToAction("Details", new { id = bm.Id});
+                await this.service.Edit(dt);
+                return RedirectToAction("Details", new { id = dt.Id});
             }
-            return View(bm);
+            return View(dt);
         }
 
         // GET: User/DailyTasks/Delete/5

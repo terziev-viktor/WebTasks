@@ -8,6 +8,7 @@ using WebTasks.Models.ViewModels;
 using WebTasks.Models.BindingModels;
 using System.Threading.Tasks;
 using System.Data.Entity;
+using WebTasks.Areas.Admin.Models.ViewModels;
 
 namespace WebTasks.Services
 {
@@ -18,7 +19,7 @@ namespace WebTasks.Services
         {
             Mapper.Initialize(x =>
             {
-                x.CreateMap<DailyTask, DailyTaskDetailedVm>()
+                x.CreateMap<DailyTask, DailyTaskDetailedUserVm>()
                     .AfterMap((a, b) =>
                     {
                         b.CommentsCount = a.Comments.Count();
@@ -30,7 +31,32 @@ namespace WebTasks.Services
                 {
                     b.Author = a.Author.UserName;
                 });
+                x.CreateMap<DailyTask, DailyTaskAdimVm>().AfterMap((a, b) =>
+                {
+                    b.CommentsCount = a.Comments.Count();
+                    b.Creator = a.Creator.UserName;
+                });
+                x.CreateMap<DailyTask, DailyTaskDetailedAdminVm>().AfterMap((a, b) =>
+                {
+                    b.CommentsCount = a.Comments.Count();
+                    b.Creator = a.Creator.UserName;
+                });
             });
+        }
+
+        internal DailyTaskDetailedAdminVm GetDetailedDailyTaskAdminVmAsync(int? id)
+        {
+            var dt = this.Context.DailyTasks.Find(id);
+            DailyTaskDetailedAdminVm vm = Mapper.Map<DailyTaskDetailedAdminVm>(dt);
+            return vm;
+        }
+
+        internal IEnumerable<DailyTaskAdimVm> GetAllDailyTaskVm()
+        {
+            var dt = this.Context.DailyTasks.ToList();
+            var adminVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskAdimVm>>(dt);
+            return adminVm;
+            
         }
 
         internal IEnumerable<DailyTaskVm> GetUserDailyTasksVm(string name)
@@ -47,7 +73,7 @@ namespace WebTasks.Services
             return this.Context.DailyTasks.Find(id);
         }
         
-        internal DailyTaskDetailedVm GetDetailedDailyTaskVm(int? id)
+        internal DailyTaskDetailedUserVm GetDetailedDailyTaskVm(int? id)
         {
             DailyTask dailyTask = this.Context.DailyTasks.Find(id);
             
@@ -55,7 +81,7 @@ namespace WebTasks.Services
             {
                 return null;
             }
-            DailyTaskDetailedVm vm = Mapper.Map<DailyTaskDetailedVm>(dailyTask);
+            DailyTaskDetailedUserVm vm = Mapper.Map<DailyTaskDetailedUserVm>(dailyTask);
 
             return vm;
         }
@@ -85,13 +111,10 @@ namespace WebTasks.Services
             this.Context.DailyTasks.Remove(dailyTask);
         }
 
-        internal async System.Threading.Tasks.Task Edit(int id, string note, string title, string description, DateTime deadline)
+        internal async System.Threading.Tasks.Task Edit(DailyTask dt)
         {
-            DailyTask dt = this.Context.DailyTasks.Find(id);
-            dt.Title = title;
-            dt.Description = description;
-            dt.Note = dt.Note;
-            dt.Deadline = deadline;
+            this.Context.Entry(dt).State = EntityState.Modified;
+            
             await this.SaveChangesAsync();
         }
 

@@ -3,9 +3,9 @@ using WebTasks.Models.ViewModels;
 
 namespace WebTasks.Areas.User.Models.ViewModels
 {
-    public class DailyTaskDetailedVm
+    public class DailyTaskDetailedUserVm
     {
-        public DailyTaskDetailedVm()
+        public DailyTaskDetailedUserVm()
         {
             this.Comments = new List<CommentVm>();
         }

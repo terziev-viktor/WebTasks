@@ -80,6 +80,13 @@ namespace WebTasks.Services
             return this.Context.Comments.Count(x => x.Id == id) > 0;
         }
 
+        internal async System.Threading.Tasks.Task<int> DeleteCommentAsync(int id)
+        {
+            var c = this.Context.Comments.Find(id);
+            this.Context.Comments.Remove(c);
+            return await this.Context.SaveChangesAsync();
+        }
+
         internal Comment CreateComment(int forTask, string content, string name)
         {
             Comment c = new Comment()

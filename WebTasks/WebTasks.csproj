@@ -204,10 +204,14 @@
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\DailyTasksController.cs" />
     <Compile Include="Areas\Admin\Controllers\ProjectsController.cs" />
+    <Compile Include="Areas\Admin\Models\ViewModels\DailyTaskAdimVm.cs" />
+    <Compile Include="Areas\Admin\Models\ViewModels\DailyTaskDetailedAdminVm.cs" />
+    <Compile Include="Areas\Admin\Models\ViewModels\ProjectAdminVm.cs" />
+    <Compile Include="Areas\Admin\Models\ViewModels\ProjectDetailedAdminVm.cs" />
     <Compile Include="Areas\User\Controllers\DailyTasksController.cs" />
     <Compile Include="Areas\User\Controllers\ProjectsController.cs" />
-    <Compile Include="Areas\User\Models\ViewModels\DailyTaskDetailedVm.cs" />
-    <Compile Include="Areas\User\Models\ViewModels\ProjectDetailedVm.cs" />
+    <Compile Include="Areas\User\Models\ViewModels\DailyTaskDetailedUserVm.cs" />
+    <Compile Include="Areas\User\Models\ViewModels\ProjectDetailedUserVm.cs" />
     <Compile Include="Areas\User\UserAreaRegistration.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
@@ -336,7 +340,6 @@
     <Content Include="Views\Comments\CommentPosted.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Views\Projects\" />
   </ItemGroup>
   <ItemGroup>
