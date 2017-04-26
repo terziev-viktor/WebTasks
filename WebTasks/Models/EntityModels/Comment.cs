@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebTasks.Models.EntityModels
 {
@@ -15,5 +16,15 @@ namespace WebTasks.Models.EntityModels
 
         [Required]
         public DateTime PublishDate { get; set; }
+
+        [ForeignKey("Project")]
+        public int? Project_Id { get; set; }
+
+        public virtual Project Project { get; set; }
+
+        [ForeignKey("DailyTask")]
+        public int? DailyTaskId { get; set; }
+
+        public virtual DailyTask DailyTask { get; set; }
     }
 }

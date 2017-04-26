@@ -1,0 +1,22 @@
+﻿@model WebTasks.Models.BindingModels.CommentPostBm
+<div class="panel-group" id="panel-comments">
+
+    @using (Ajax.BeginForm("Create", "Comments", new { area = "", ForTask = Model.ForTask, TaskType = Model.TaskType }, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        InsertionMode = InsertionMode.InsertBefore, //target element will be updated
+        UpdateTargetId = "panel-comments"
+    }))
+    {
+        <div class="form-group">
+            @Html.Label("Write a comment for this task", new { @class = "form-label" })
+            <textarea class="form-control" style="width: 100%; max-width: 100%; min-width: 100%;" id="content" name="Content"></textarea>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" class="btn btn-default" value="Post" />
+        </div>
+    }
+
+
+</div>

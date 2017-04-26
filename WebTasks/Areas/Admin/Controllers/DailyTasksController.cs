@@ -13,10 +13,11 @@ namespace WebTasks.Areas.Admin.Controllers
     public class DailyTasksController : Controller
     {
         private readonly DailyTasksService service = new DailyTasksService();
+
         // GET: Admin/DailyTasks
-        public ActionResult Index()
+        public ActionResult Index(string filter = "", int page = 1)
         {
-            IEnumerable<DailyTaskAdimVm> data = this.service.GetAllDailyTaskVm();
+            IEnumerable<DailyTaskAdimVm> data = this.service.GetAllDailyTaskVm(filter, page);
             return View(data);
         }
 

@@ -3,8 +3,6 @@
 @{
     ViewBag.Title = "Details";
 }
-@Scripts.Render("~/bundles/comments")
-
 <h2>Details</h2>
 
 <div>
@@ -59,12 +57,14 @@
     <div class="panel-body">
         <textarea id="txtarea-comment" style="width: 100%; min-width: 100%; max-width=100%; margin-bottom: 5px;"></textarea>
         <div class="btn-group">
-            <button class="btn btn-default" onclick="post(@Model.Id)">Post</button>
+            <button class="btn btn-default" onclick="postCment(@Model.Id)">Post</button>
             <button class="btn btn-default" onclick="clearTxtArea()">Clear</button>
         </div>
     </div>
 </div>
-
+@*@{
+    Html.RenderPartial("_PostCommentPartial", new WebTasks.Models.BindingModels.CommentPostBm() { ForTask = Model.Id, TaskType = 0 });
+}*@
 @foreach (var item in Model.Comments)
 {
     <div id="comment-@item.Id" class="panel panel-default">

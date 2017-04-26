@@ -1,4 +1,4 @@
-﻿namespace WebTasks.Areas.User.Models.ViewModels
+﻿namespace WebTasks.Models.ViewModels
 {
     public class PersonVm
     {

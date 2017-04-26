@@ -15,17 +15,13 @@ namespace WebTasks.Areas.User.Controllers
     [Authorize]
     public class DailyTasksController : Controller
     {
-        private DailyTasksService service;
-        public DailyTasksController()
-        {
-            service = new DailyTasksService();
-        }
+        private readonly DailyTasksService service = new DailyTasksService();
 
         // GET: User/DailyTasks
-        public ActionResult Index()
+        public ActionResult Index(string filter = "", int page=1)
         {
             ViewBag.Header = "Your daily tasks";
-            IEnumerable<DailyTaskVm> tasksVm = this.service.GetUserDailyTasksVm(this.User.Identity.GetUserId());
+            IEnumerable<DailyTaskVm> tasksVm = this.service.GetUserDailyTasksVm(filter, page, this.User.Identity.GetUserId());
             return View(tasksVm);
         }
 
@@ -39,7 +35,7 @@ namespace WebTasks.Areas.User.Controllers
             }
 
             var vm = this.service.GetDetailedDailyTaskVm(id);
-
+            
             if (vm == null)
             {
                 return this.HttpNotFound();
@@ -95,7 +91,7 @@ namespace WebTasks.Areas.User.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTask dt)
         {
-            if(dt.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
+            if(!this.service.IsOwner(dt.Id, this.User.Identity.GetUserId()) && !this.User.IsInRole("Admin"))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }

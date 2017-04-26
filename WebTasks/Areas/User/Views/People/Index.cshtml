@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebTasks.Areas.User.Models.ViewModels.PersonVm>
+﻿@model IEnumerable<WebTasks.Models.ViewModels.PersonVm>
 
 @{
     ViewBag.Title = "People";
@@ -25,7 +25,7 @@
 }
 
 <div id="loader" class=" aletr" style="display:none">
-    Loading...<img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" width="40px" height="40px" />
+    Loading...<img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" width="50" height="50" />
 </div>
 
 @Html.Partial("PeopleTable") @* this is view with patient table. Same view you will return from controller *@

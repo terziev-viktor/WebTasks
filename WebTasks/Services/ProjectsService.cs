@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using WebTasks.Models.EntityModels;
@@ -17,7 +15,7 @@ namespace WebTasks.Services
     public class ProjectsService : Service
     {
         public ProjectsService()
-            : base()
+            : base(10)
         {
 
         }
@@ -27,9 +25,11 @@ namespace WebTasks.Services
             return Mapper.Instance.Map<IEnumerable<Project>, IEnumerable<ProjectVm>>(this.Context.Projects.Where(x => x.Creator.Id == id));
         }
 
-        internal IEnumerable<Project> GetUserProjectsToList(string userId)
+        internal async Task<IEnumerable<Project>> GetUserProjectsToList(string filter, int page, string userId)
         {
-            return this.Context.Projects.Where(x => x.Creator.Id == userId);
+            return await this.Context.Projects.Where(x => x.Creator.Id == userId && x.Title.Contains(filter))
+                .OrderByDescending(x => x.Id)
+                .Skip((page-1)*PageSize).Take(PageSize).ToListAsync();
         }
 
         internal async Task<ProjectDetailedAdminVm> GetProjectDetailedAdminVm(int? id)
@@ -49,9 +49,12 @@ namespace WebTasks.Services
             return Mapper.Instance.Map<IEnumerable<Project>, IEnumerable<ProjectVm>>(projects);
         }
 
-        internal async Task<IEnumerable<Project>> GetProjectsToListAsync()
+        internal async Task<IEnumerable<Project>> GetProjectsToListAsync(string filter, int page)
         {
-            return await this.Context.Projects.ToListAsync();
+            return await this.Context.Projects
+                .Where(x => x.Title.Contains(filter))
+                .OrderByDescending(x => x.Id)
+                .Skip((page - 1) * PageSize).Take(PageSize).ToListAsync();
         }
 
         internal async System.Threading.Tasks.Task AddProjectAsync(ProjectBm bm, string creator)
@@ -95,7 +98,7 @@ namespace WebTasks.Services
         {
             return Mapper.Map<ProjectVm>(project);
         }
-        
+
         internal void UpdateProject(Project p, ProjectBm bm)
         {
             p.Plan = bm.Plan;

@@ -208,7 +208,6 @@
     <Compile Include="Areas\Admin\Models\ViewModels\DailyTaskAdimVm.cs" />
     <Compile Include="Areas\Admin\Models\ViewModels\DailyTaskDetailedAdminVm.cs" />
     <Compile Include="Areas\Admin\Models\ViewModels\PersonDetailedAdminVm.cs" />
-    <Compile Include="Areas\Admin\Models\ViewModels\PersonAdminVm.cs" />
     <Compile Include="Areas\Admin\Models\ViewModels\ProjectAdminVm.cs" />
     <Compile Include="Areas\Admin\Models\ViewModels\ProjectDetailedAdminVm.cs" />
     <Compile Include="Areas\User\Controllers\PeopleController.cs" />
@@ -216,7 +215,7 @@
     <Compile Include="Areas\User\Controllers\ProjectsController.cs" />
     <Compile Include="Areas\User\Models\ViewModels\DailyTaskDetailedUserVm.cs" />
     <Compile Include="Areas\User\Models\ViewModels\PersonDetailedVm.cs" />
-    <Compile Include="Areas\User\Models\ViewModels\PersonVm.cs" />
+    <Compile Include="Models\ViewModels\PersonVm.cs" />
     <Compile Include="Areas\User\Models\ViewModels\ProjectDetailedUserVm.cs" />
     <Compile Include="Areas\User\UserAreaRegistration.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -231,6 +230,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BindingModels\CommentBm.cs" />
+    <Compile Include="Models\BindingModels\CommentPostBm.cs" />
     <Compile Include="Models\BindingModels\DailyTaskBm.cs" />
     <Compile Include="Models\BindingModels\ProjectBm.cs" />
     <Compile Include="Models\EntityModels\Comment.cs" />
@@ -289,12 +289,9 @@
     <Content Include="Areas\Admin\Views\Projects\Details.cshtml" />
     <Content Include="Areas\Admin\Views\Projects\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Projects\Index.cshtml" />
-    <Content Include="Areas\User\Views\People\Create.cshtml" />
-    <Content Include="Areas\User\Views\People\Delete.cshtml" />
     <Content Include="Areas\User\Views\People\Details.cshtml" />
-    <Content Include="Areas\User\Views\People\Edit.cshtml" />
     <Content Include="Areas\User\Views\People\Index.cshtml" />
-    <Content Include="Areas\User\Views\People\PeopleTable.cshtml" />
+    <Content Include="Views\Shared\PeopleTable.cshtml" />
     <Content Include="Areas\Admin\Views\People\Create.cshtml" />
     <Content Include="Areas\Admin\Views\People\Delete.cshtml" />
     <Content Include="Areas\Admin\Views\People\Details.cshtml" />
@@ -348,6 +345,8 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Comments\CommentPosted.cshtml" />
+    <Content Include="Views\Shared\_PostCommentPartial.cshtml" />
+    <Content Include="Views\Shared\_DailyTasksPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Projects\" />

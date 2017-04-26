@@ -7,9 +7,8 @@ namespace WebTasks.Models.EntityModels
     {
         public Task()
         {
-            this.Comments = new List<Comment>();
-        }
 
+        }
         [Key]
         public int Id { get; set; }
 
@@ -23,7 +22,5 @@ namespace WebTasks.Models.EntityModels
 
         [Required]
         public virtual ApplicationUser Creator { get; set; }
-
-        public ICollection<Comment> Comments { get; set; }
     }
 }

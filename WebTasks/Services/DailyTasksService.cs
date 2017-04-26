@@ -16,7 +16,7 @@ namespace WebTasks.Services
     public class DailyTasksService : Service
     {
         public DailyTasksService()
-            : base()
+            : base(10)
         {
 
         }
@@ -28,21 +28,27 @@ namespace WebTasks.Services
             return vm;
         }
 
-        internal IEnumerable<DailyTaskAdimVm> GetAllDailyTaskVm()
+        internal IEnumerable<DailyTaskAdimVm> GetAllDailyTaskVm(string filter, int page)
         {
             var dt = this.Context.DailyTasks.ToList();
 
-            var adminVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskAdimVm>>(dt);
+            var adminVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskAdimVm>>(dt)
+                .OrderByDescending(x => x.Id)
+                .Skip(((page - 1) * PageSize)).Take(PageSize);
+            
             return adminVm;
             
         }
 
-        internal IEnumerable<DailyTaskVm> GetUserDailyTasksVm(string id)
+        internal IEnumerable<DailyTaskVm> GetUserDailyTasksVm(string filter, int page, string id)
         {
             var currentUser = this.UserManager.FindById(id);
 
-            var tasks = this.Context.DailyTasks.Where(x => x.Creator.Id == currentUser.Id).ToList();
-            IEnumerable<DailyTaskVm> tasksVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskVm>>(tasks);
+            var tasks = this.Context.DailyTasks.Where(x => x.Creator.Id == currentUser.Id && x.Title.Contains(filter)).ToList();
+            IEnumerable<DailyTaskVm> tasksVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskVm>>(tasks)
+                .OrderByDescending(x => x.Id)
+                .Skip((page - 1) * PageSize).Take(PageSize);
+            
 
             return tasksVm;
         }
@@ -80,6 +86,11 @@ namespace WebTasks.Services
             dailyTask.Creator = creator;
             this.Context.DailyTasks.Add(dailyTask);
             return await this.Context.SaveChangesAsync();
+        }
+
+        internal bool IsOwner(int id, string v)
+        {
+            return this.Context.DailyTasks.Find(id).Creator.Id == v;
         }
 
         internal Task<DailyTask> FindDailyTaskById(int? id)

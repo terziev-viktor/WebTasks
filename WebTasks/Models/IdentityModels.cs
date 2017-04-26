@@ -33,5 +33,16 @@ namespace WebTasks.Models
         {
             return new ApplicationDbContext();
         }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DailyTask>().HasMany(x => x.Comments).WithOptional().WillCascadeOnDelete(false);
+            modelBuilder.Entity<Project>().HasMany(x => x.Comments).WithOptional().WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Comment>().HasOptional<DailyTask>(x => x.DailyTask).WithMany().WillCascadeOnDelete(false);
+            modelBuilder.Entity<Comment>().HasOptional<Project>(x => x.Project).WithMany().WillCascadeOnDelete(false);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

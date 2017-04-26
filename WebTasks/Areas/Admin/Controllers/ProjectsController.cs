@@ -15,9 +15,9 @@ namespace WebTasks.Areas.Admin.Controllers
         private readonly ProjectsService service = new ProjectsService();
 
         // GET: Admin/Projects
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
-            IEnumerable<Project> p = await this.service.GetProjectsToListAsync();
+            IEnumerable<Project> p = await this.service.GetProjectsToListAsync(filter, page);
             IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
 
             return View(vm);

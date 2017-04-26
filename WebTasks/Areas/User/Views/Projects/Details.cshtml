@@ -71,6 +71,9 @@
         </div>
     </div>
 </div>
+@*@{
+    Html.RenderPartial("_PostCommentPartial", new WebTasks.Models.BindingModels.CommentPostBm() { ForTask = Model.Id, TaskType = 1 });
+}*@
 
 @foreach (var item in Model.Comments)
 {
@@ -87,7 +90,6 @@
 @if (Model.CommentsCount > 0)
 {
     <p>
-        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
         @Html.ActionLink("Back to List", "Index")
     </p>
 }

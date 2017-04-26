@@ -13,7 +13,7 @@ namespace WebTasks.Services
     public class CommentsService : Service
     {
         public CommentsService()
-            : base()
+            : base(10)
         {
 
         }

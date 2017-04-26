@@ -15,10 +15,8 @@ namespace WebTasks.Services
 {
     public class PeopleService : Service
     {
-        private readonly int pageSize = 10;
-
         public PeopleService()
-            : base()
+            : base(10)
         {
 
         }
@@ -30,10 +28,11 @@ namespace WebTasks.Services
             return vm;
         }
 
-        internal async Task<IEnumerable<PersonAdminVm>> GetAllUsersAync()
+        internal async Task<IEnumerable<PersonVm>> GetAllUsersAync(string filter, int page)
         {
-            var users = await this.UserManager.Users.ToListAsync();
-            IEnumerable<PersonAdminVm> vm = Mapper.Instance.Map<IEnumerable<ApplicationUser>, IEnumerable<PersonAdminVm>>(users);
+            var users = await this.UserManager.Users.Where(x => x.UserName.Contains(filter))
+                .OrderBy(x => x.UserName).Skip((page - 1) * PageSize).Take(PageSize).ToListAsync();
+            IEnumerable<PersonVm> vm = Mapper.Instance.Map<IEnumerable<ApplicationUser>, IEnumerable<PersonVm>>(users);
             return vm;
         }
 
@@ -46,18 +45,13 @@ namespace WebTasks.Services
 
         internal async System.Threading.Tasks.Task<IEnumerable<PersonVm>> GetAllUsersByUserName(string filter, int page)
         {
-            List<ApplicationUser> users = new List<ApplicationUser>();
-            if (filter != null)
-            {
-                users.AddRange(await this.UserManager.Users.Where(x => x.UserName.Contains(filter)).ToListAsync());
-            }
-            else
-            {
-                users.AddRange(await this.UserManager.Users.Take(pageSize).ToListAsync());
-            }
-            if (users.Count > pageSize)
-            users.RemoveRange((page - 1) * pageSize, pageSize);
-
+            List<ApplicationUser> users = 
+                await this.UserManager.Users
+                .Where(x => x.UserName.Contains(filter))
+                .OrderBy(x => x.UserName)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize).ToListAsync();
+            
             IEnumerable<PersonVm> vm = Mapper.Instance.Map<IEnumerable<ApplicationUser>, IEnumerable<PersonVm>>(users);
 
             return vm;

@@ -13,13 +13,13 @@ namespace WebTasks.Areas.Admin.Controllers
         private readonly DailyTasksService dailyTaskService = new DailyTasksService();
         private readonly ProjectsService projectsService = new ProjectsService();
 
-        // GET: Admin/ApplicationUsers
-        public async Task<ActionResult> Index()
+        // GET: Admin/Users
+        public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
-            return View(await this.service.GetAllUsersAync());
+            return View(await this.service.GetAllUsersAync(filter, page));
         }
 
-        // GET: Admin/ApplicationUsers/Details/5
+        // GET: Admin/Users/Details/5
         public async Task<ActionResult> Details(string userId)
         {
             if (userId == null)

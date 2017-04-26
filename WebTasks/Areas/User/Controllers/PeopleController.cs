@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using WebTasks.Services;
 using System.Collections.Generic;
 using WebTasks.Areas.User.Models.ViewModels;
+using WebTasks.Models.ViewModels;
 
 namespace WebTasks.Areas.User.Controllers
 {
@@ -15,7 +16,7 @@ namespace WebTasks.Areas.User.Controllers
         private readonly ProjectsService projectsService = new ProjectsService();
 
         // GET: User/People
-        public async Task<ActionResult> Index(string filter, int page)
+        public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
             IEnumerable<PersonVm> vm = await this.service.GetAllUsersByUserName(filter, page);
             return View(vm);

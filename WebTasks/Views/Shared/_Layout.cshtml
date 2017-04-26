@@ -24,8 +24,8 @@
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("User Area", "Index", "User/DailyTasks")</li>
-                    <li>@Html.ActionLink("Admin Area", "Index", "Admin/DailyTasks")</li>
+                    @*<li>@Html.ActionLink("User Area", "Index", "DailyTasks", new { area="User", filter = "", page = 1 })</li>
+                    <li>@Html.ActionLink("Admin Area", "Index", "DailyTasks", new { area = "Admin", filter = "", page = 1 })</li>*@
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

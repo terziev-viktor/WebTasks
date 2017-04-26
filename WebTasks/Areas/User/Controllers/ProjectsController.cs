@@ -21,9 +21,9 @@ namespace WebTasks.Areas.User.Controllers
         }
 
         // GET: User/Projects
-        public ActionResult Index()
+        public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
-            return View(this.service.GetUserProjectsToList(this.User.Identity.GetUserId()));
+            return View(await this.service.GetUserProjectsToList(filter, page, this.User.Identity.GetUserId()));
         }
 
         // GET: User/Projects/Details/5
