@@ -1,4 +1,4 @@
-﻿function post(task_id) {
+﻿function postCment(task_id, task_type) {
     let txt = $('#txtarea-comment').val();
     if (txt === null) {
         return;
@@ -13,6 +13,7 @@
         url: "/Comments/Create",
         data: {
             ForTask: task_id,
+            TaskType: task_type,
             Content: txt
         },
         success: (result) => {

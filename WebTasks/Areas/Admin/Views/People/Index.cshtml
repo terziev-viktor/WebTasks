@@ -1,0 +1,50 @@
+﻿@model IEnumerable<WebTasks.Areas.Admin.Models.ViewModels.PersonAdminVm>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            User Name
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            Daily Tasks
+        </th>
+        <th>
+            Projects
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        
+        <td>
+            @Html.DisplayFor(modelItem => item.UserName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DailyTasksCount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProjectsCount)
+        </td>
+        <td>
+            @Html.ActionLink("View Profile", "Details", new { userId = item.Id })
+        </td>
+    </tr>
+}
+
+</table>

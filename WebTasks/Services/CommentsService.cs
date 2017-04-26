@@ -6,20 +6,16 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using WebTasks.Models.BindingModels;
 using WebTasks.Models.ViewModels;
+using Microsoft.AspNet.Identity;
 
 namespace WebTasks.Services
 {
     public class CommentsService : Service
     {
         public CommentsService()
+            : base()
         {
-            Mapper.Initialize(x =>
-            {
-                x.CreateMap<Comment, CommentVm>().AfterMap((a, b) =>
-                {
-                    b.Author = a.Author.Email;
-                });
-            });
+
         }
 
         internal IEnumerable<Comment> GetAllComments()
@@ -53,20 +49,23 @@ namespace WebTasks.Services
             return Mapper.Instance.Map<CommentBm, Comment>(bm);
         }
 
-        internal bool AddComment(Comment c, int fortask)
+        internal bool AddComment(Comment c, int fortask, int taskType)
         {
-            var dt = this.Context.DailyTasks.Find(fortask);
-            if(dt != null)
+            if (taskType == 0)
             {
+                var dt = this.Context.DailyTasks.Find(fortask);
                 dt.Comments.Add(c);
+                this.SaveChanges();
                 return true;
             }
-            var p = this.Context.Projects.Find(fortask);
-            if(p != null)
+            else if(taskType == 1)
             {
+                var p = this.Context.Projects.Find(fortask);
                 p.Comments.Add(c);
+                this.SaveChanges();
                 return true;
             }
+            
             return false;
         }
 
@@ -87,13 +86,13 @@ namespace WebTasks.Services
             return await this.Context.SaveChangesAsync();
         }
 
-        internal Comment CreateComment(int forTask, string content, string name)
+        internal Comment CreateComment(int forTask, string content, string id)
         {
             Comment c = new Comment()
             {
                 Content = content,
                 PublishDate = DateTime.Now,
-                Author = this.UserManager.Users.First(x => x.UserName == name)
+                Author = this.UserManager.FindById(id)
             };
 
             return c;

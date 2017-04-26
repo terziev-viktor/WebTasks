@@ -6,6 +6,7 @@ using WebTasks.Services;
 using WebTasks.Areas.User.Models.ViewModels;
 using WebTasks.Models.BindingModels;
 using WebTasks.Models.ViewModels;
+using Microsoft.AspNet.Identity;
 
 namespace WebTasks.Areas.User.Controllers
 {
@@ -22,7 +23,7 @@ namespace WebTasks.Areas.User.Controllers
         // GET: User/Projects
         public ActionResult Index()
         {
-            return View(this.service.GetProjectsToList());
+            return View(this.service.GetUserProjectsToList(this.User.Identity.GetUserId()));
         }
 
         // GET: User/Projects/Details/5
@@ -57,7 +58,7 @@ namespace WebTasks.Areas.User.Controllers
         {
             if (ModelState.IsValid)
             {
-                this.service.AddProject(bm, this.User.Identity.Name);
+                this.service.AddProject(bm, this.User.Identity.GetUserId());
                 await this.service.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -73,7 +74,10 @@ namespace WebTasks.Areas.User.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Project project = await service.FindProjectAsync(id);
-
+            if(project.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
             if (project == null)
             {
                 return HttpNotFound();
@@ -87,15 +91,23 @@ namespace WebTasks.Areas.User.Controllers
         // POST: User/Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id")] ProjectBm bm)
+        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Description,Title")] ProjectBm bm)
         {
-            if (ModelState.IsValid)
+            
+            if (!ModelState.IsValid)
             {
-                Project p = await this.service.FindProjectAsync(bm.Id);
-                this.service.UpdateProject(p);
-                return RedirectToAction("Details", new { id = bm.Id });
+                return View(bm);
             }
-            return View(bm);
+
+            Project p = await this.service.FindProjectAsync(bm.Id);
+
+            if(p.Creator.Id != this.User.Identity.GetUserId() && this.User.IsInRole("Admin"))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
+            this.service.UpdateProject(p, bm);
+            return RedirectToAction("Details", new { id = bm.Id });
+            
         }
 
         // GET: User/Projects/Delete/5
@@ -109,6 +121,10 @@ namespace WebTasks.Areas.User.Controllers
             if (p == null)
             {
                 return HttpNotFound();
+            }
+            if(p.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
+            {
+                return new HttpUnauthorizedResult();
             }
             ProjectVm vm = this.service.GetProjectVm(p);
 
@@ -130,7 +146,7 @@ namespace WebTasks.Areas.User.Controllers
         {
             if (disposing)
             {
-                this.service.DisposeContext();
+                this.service.Dispose();
             }
             base.Dispose(disposing);
         }

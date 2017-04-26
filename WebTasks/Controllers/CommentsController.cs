@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using Microsoft.AspNet.Identity;
+using System.Web.Mvc;
 using WebTasks.Models.EntityModels;
 using WebTasks.Models.ViewModels;
 using WebTasks.Services;
@@ -26,13 +27,12 @@ namespace WebTasks.Controllers
         // POST: Comments/Create
         [HttpPost]
         [Authorize]
-        public ActionResult Create(string Content, int ForTask)
+        public ActionResult Create(string Content, int ForTask, int TaskType)
         {
-            Comment c = this.service.CreateComment(ForTask, Content, this.User.Identity.Name);
-            bool added = this.service.AddComment(c, ForTask);
+            Comment c = this.service.CreateComment(ForTask, Content, this.User.Identity.GetUserId());
+            bool added = this.service.AddComment(c, ForTask, TaskType);
             if(added)
             {
-                this.service.SaveChanges();
                 CommentVm vm = this.service.GetCommentVm(c);
                 return PartialView("CommentPosted", vm);
             }

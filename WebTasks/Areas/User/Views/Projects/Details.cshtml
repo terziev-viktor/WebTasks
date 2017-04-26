@@ -1,4 +1,4 @@
-﻿@model WebTasks.Areas.User.Models.ViewModels.ProjectDetailedVm
+﻿@model WebTasks.Areas.User.Models.ViewModels.ProjectDetailedUserVm
 
 @{
     ViewBag.Title = "Details";
@@ -53,10 +53,7 @@
     </dl>
 </div>
 
-
-
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
 
@@ -69,7 +66,7 @@
     <div class="panel-body">
         <textarea id="txtarea-comment" style="width: 100%; min-width: 100%; max-width=100%; margin-bottom: 5px;"></textarea>
         <div class="btn-group">
-            <button class="btn btn-default" onclick="post(@Model.Id)">Post</button>
+            <button class="btn btn-default" onclick="postCment(@Model.Id, 1)">Post</button>
             <button class="btn btn-default" onclick="clearTxtArea()">Clear</button>
         </div>
     </div>

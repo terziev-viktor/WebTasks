@@ -24,6 +24,6 @@ namespace WebTasks.Models.EntityModels
         [Required]
         public virtual ApplicationUser Creator { get; set; }
 
-        public virtual ICollection<Comment> Comments { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
 }

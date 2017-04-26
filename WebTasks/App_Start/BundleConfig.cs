@@ -1,5 +1,4 @@
-﻿using System.Web;
-using System.Web.Optimization;
+﻿using System.Web.Optimization;
 
 namespace WebTasks
 {
@@ -16,6 +15,9 @@ namespace WebTasks
 
             bundles.Add(new ScriptBundle("~/bundles/comments").Include(
                         "~/Scripts/comments.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/search").Include(
+                        "~/Scripts/search.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at https://modernizr.com to pick only the tests you need.

@@ -28,7 +28,7 @@ namespace WebTasks.Models
         public virtual DbSet<DailyTask> DailyTasks { get; set; }
 
         public virtual DbSet<Project> Projects { get; set; }
-
+        
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();

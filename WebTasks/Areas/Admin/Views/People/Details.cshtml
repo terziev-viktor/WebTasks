@@ -1,0 +1,145 @@
+﻿@model WebTasks.Areas.Admin.Models.ViewModels.PersonDetailedAdminVm
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ApplicationUser</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AccessFailedCount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AccessFailedCount)
+        </dd>
+        <dt>
+            Number of Projects
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProjectsCount)
+        </dd>
+
+        <dt>
+            Number of Daily Tasks
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DailyTasksCount)
+        </dd>
+
+        <dt>
+            Comments Posted
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CommentsCount)
+        </dd>
+    </dl>
+</div>
+
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+
+<h3>Daily Tasks</h3>
+
+<table class="table">
+    <tr>
+        <th>
+            Title
+        </th>
+        <th>
+            Note
+        </th>
+        <th>
+            Number of comments
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.DailyTasks)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "Details", "DailyTasks", new { id = item.Id }, new { })
+            </td>
+        </tr>
+    }
+</table>
+
+<h3>Projects</h3>
+
+<table class="table">
+    <tr>
+        <th>
+            Release Date
+        </th>
+        <th>
+            Plan
+        </th>
+        <th>
+            Title
+        </th>
+        <th>
+            Description
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Projects)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReleaseDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Plan)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "Details", "Projects", new { id = item.Id }, new { })
+            </td>
+        </tr>
+    }
+</table>
+@if (Model.CommentsCount > 0 || Model.DailyTasksCount > 0 || Model.ProjectsCount > 0)
+{
+    @Html.ActionLink("Back to List", "Index")
+}

@@ -43,7 +43,7 @@ namespace WebTasks.Migrations
                 var roleUserCreated = roleManager.Create(new IdentityRole("User"));
             }
 
-            var userA= userManager.Users.FirstOrDefault(x => x.Email == "the@admin.net");
+            var userA = userManager.Users.FirstOrDefault(x => x.Email == "the@admin.net");
             userManager.AddToRole(userA.Id, "Admin");
 
             var userU = userManager.Users.FirstOrDefault(x => x.Email == "user@user.net");
@@ -57,6 +57,7 @@ namespace WebTasks.Migrations
                 Deadline = DateTime.Now,
                 Creator = context.Users.First(x => x.UserName == "user@user.net")
             };
+
             dtask1.Comments.Add(new Models.EntityModels.Comment()
             {
                 Author = userManager.Users.First(),

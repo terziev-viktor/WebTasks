@@ -10,6 +10,7 @@ using WebTasks.Areas.User.Models.ViewModels;
 using WebTasks.Models.BindingModels;
 using WebTasks.Models.ViewModels;
 using WebTasks.Areas.Admin.Models.ViewModels;
+using Microsoft.AspNet.Identity;
 
 namespace WebTasks.Services
 {
@@ -18,31 +19,17 @@ namespace WebTasks.Services
         public ProjectsService()
             : base()
         {
-            Mapper.Initialize(x =>
-            {
-                x.CreateMap<Comment, CommentVm>();
-                x.CreateMap<Project, ProjectDetailedUserVm>().AfterMap((a, b) =>
-                {
-                    b.CommentsCount = a.Comments.Count();
-                });
 
-                x.CreateMap<Project, ProjectVm>().AfterMap((a, b) =>
-                {
-                    b.CommentsCount = a.Comments.Count();
-                });
+        }
 
-                x.CreateMap<ProjectBm, Project>();
-                x.CreateMap<Project, ProjectAdminVm>().AfterMap((a, b) =>
-                {
-                    b.Creator = a.Creator.UserName;
-                    b.CommentsCount = a.Comments.Count();
-                });
-                x.CreateMap<Project, ProjectDetailedAdminVm>().AfterMap((a, b) =>
-                {
-                    b.CommentsCount = a.Comments.Count();
-                    b.Creator = a.Creator.UserName;
-                });
-            });
+        internal IEnumerable<ProjectVm> GetUserProjectsVm(string id)
+        {
+            return Mapper.Instance.Map<IEnumerable<Project>, IEnumerable<ProjectVm>>(this.Context.Projects.Where(x => x.Creator.Id == id));
+        }
+
+        internal IEnumerable<Project> GetUserProjectsToList(string userId)
+        {
+            return this.Context.Projects.Where(x => x.Creator.Id == userId);
         }
 
         internal async Task<ProjectDetailedAdminVm> GetProjectDetailedAdminVm(int? id)
@@ -54,6 +41,12 @@ namespace WebTasks.Services
         internal IEnumerable<ProjectAdminVm> MapToProjectsAdminVm(IEnumerable<Project> p)
         {
             return Mapper.Instance.Map<IEnumerable<Project>, IEnumerable<ProjectAdminVm>>(p);
+        }
+
+        internal async Task<IEnumerable<ProjectVm>> GetUserProjects(string id)
+        {
+            var projects = await this.Context.Projects.Where(x => x.Creator.Id == id).ToListAsync();
+            return Mapper.Instance.Map<IEnumerable<Project>, IEnumerable<ProjectVm>>(projects);
         }
 
         internal async Task<IEnumerable<Project>> GetProjectsToListAsync()
@@ -93,7 +86,8 @@ namespace WebTasks.Services
         internal void AddProject(ProjectBm bm, string creator)
         {
             Project p = Mapper.Map<Project>(bm);
-            p.Creator = this.UserManager.Users.First(x => x.UserName == creator);
+            p.Creator = this.UserManager.FindById(creator);
+
             this.Context.Projects.Add(p);
         }
 
@@ -102,6 +96,15 @@ namespace WebTasks.Services
             return Mapper.Map<ProjectVm>(project);
         }
         
+        internal void UpdateProject(Project p, ProjectBm bm)
+        {
+            p.Plan = bm.Plan;
+            p.Description = bm.Description;
+            p.ReleaseDate = bm.ReleaseDate;
+            p.Title = bm.Title;
+            this.Context.SaveChanges();
+        }
+
         internal void UpdateProject(Project p)
         {
             this.Context.Entry(p).State = EntityState.Modified;

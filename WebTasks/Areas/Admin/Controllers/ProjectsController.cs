@@ -126,7 +126,7 @@ namespace WebTasks.Areas.Admin.Controllers
         {
             if (disposing)
             {
-                this.service.DisposeContext();
+                this.service.Dispose();
             }
             base.Dispose(disposing);
         }

@@ -8,6 +8,7 @@ using AutoMapper;
 using WebTasks.Services;
 using WebTasks.Models.ViewModels;
 using System.Collections.Generic;
+using Microsoft.AspNet.Identity;
 
 namespace WebTasks.Areas.User.Controllers
 {
@@ -24,7 +25,7 @@ namespace WebTasks.Areas.User.Controllers
         public ActionResult Index()
         {
             ViewBag.Header = "Your daily tasks";
-            IEnumerable<DailyTaskVm> tasksVm = this.service.GetUserDailyTasksVm(this.User.Identity.Name);
+            IEnumerable<DailyTaskVm> tasksVm = this.service.GetUserDailyTasksVm(this.User.Identity.GetUserId());
             return View(tasksVm);
         }
 
@@ -60,7 +61,7 @@ namespace WebTasks.Areas.User.Controllers
         {
             if (ModelState.IsValid)
             {
-                await this.service.CreateNewTask(bm, this.User.Identity.Name);
+                await this.service.CreateNewTask(bm, this.User.Identity.GetUserId());
                 return RedirectToAction("Index");
             }
 
@@ -76,7 +77,11 @@ namespace WebTasks.Areas.User.Controllers
             }
 
             DailyTask dailyTask = await this.service.FindDailyTaskById(id);
-
+            // Only the creator and admins can edit the task
+            if(dailyTask.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
             if (dailyTask == null)
             {
                 return HttpNotFound();
@@ -90,6 +95,10 @@ namespace WebTasks.Areas.User.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTask dt)
         {
+            if(dt.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
             if (ModelState.IsValid)
             {
                 await this.service.Edit(dt);
@@ -106,6 +115,10 @@ namespace WebTasks.Areas.User.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             DailyTask dailyTask = await this.service.FindDailyTaskById(id);
+            if (dailyTask.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
             if (dailyTask == null)
             {
                 return HttpNotFound();
@@ -128,7 +141,7 @@ namespace WebTasks.Areas.User.Controllers
         {
             if (disposing)
             {
-                this.service.DisposeContext();
+                this.service.Dispose();
             }
             base.Dispose(disposing);
         }
