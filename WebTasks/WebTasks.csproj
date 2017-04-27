@@ -205,7 +205,7 @@
     <Compile Include="Areas\Admin\Controllers\PeopleController.cs" />
     <Compile Include="Areas\Admin\Controllers\DailyTasksController.cs" />
     <Compile Include="Areas\Admin\Controllers\ProjectsController.cs" />
-    <Compile Include="Areas\Admin\Models\ViewModels\DailyTaskAdimVm.cs" />
+    <Compile Include="Areas\Admin\Models\ViewModels\DailyTaskAdminVm.cs" />
     <Compile Include="Areas\Admin\Models\ViewModels\DailyTaskDetailedAdminVm.cs" />
     <Compile Include="Areas\Admin\Models\ViewModels\PersonDetailedAdminVm.cs" />
     <Compile Include="Areas\Admin\Models\ViewModels\ProjectAdminVm.cs" />
@@ -291,12 +291,35 @@
     <Content Include="Areas\Admin\Views\Projects\Index.cshtml" />
     <Content Include="Areas\User\Views\People\Details.cshtml" />
     <Content Include="Areas\User\Views\People\Index.cshtml" />
+    <Content Include="Scripts\dailyTasksPagination.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\noty\jquery.noty.js" />
+    <Content Include="Scripts\noty\layouts\bottom.js" />
+    <Content Include="Scripts\noty\layouts\bottomCenter.js" />
+    <Content Include="Scripts\noty\layouts\bottomLeft.js" />
+    <Content Include="Scripts\noty\layouts\bottomRight.js" />
+    <Content Include="Scripts\noty\layouts\center.js" />
+    <Content Include="Scripts\noty\layouts\centerLeft.js" />
+    <Content Include="Scripts\noty\layouts\centerRight.js" />
+    <Content Include="Scripts\noty\layouts\inline.js" />
+    <Content Include="Scripts\noty\layouts\top.js" />
+    <Content Include="Scripts\noty\layouts\topCenter.js" />
+    <Content Include="Scripts\noty\layouts\topLeft.js" />
+    <Content Include="Scripts\noty\layouts\topRight.js" />
+    <Content Include="Scripts\noty\themes\bootstrap.js" />
+    <Content Include="Scripts\noty\themes\default.js" />
+    <Content Include="Scripts\noty\themes\relax.js" />
+    <Content Include="Scripts\projectsPagination.js" />
     <Content Include="Views\Shared\PeopleTable.cshtml" />
     <Content Include="Areas\Admin\Views\People\Create.cshtml" />
     <Content Include="Areas\Admin\Views\People\Delete.cshtml" />
     <Content Include="Areas\Admin\Views\People\Details.cshtml" />
     <Content Include="Areas\Admin\Views\People\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\People\Index.cshtml" />
+    <Content Include="Areas\User\Views\Shared\ProjectsPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\ProjectsPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\DailyTasksPartial.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\comments.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -346,7 +369,8 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Comments\CommentPosted.cshtml" />
     <Content Include="Views\Shared\_PostCommentPartial.cshtml" />
-    <Content Include="Views\Shared\_DailyTasksPartial.cshtml" />
+    <Content Include="Areas\User\Views\Shared\DailyTasksPartial.cshtml" />
+    <Content Include="Views\Shared\Loader.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Projects\" />

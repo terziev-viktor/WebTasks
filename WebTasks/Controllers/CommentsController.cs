@@ -29,6 +29,15 @@ namespace WebTasks.Controllers
         [Authorize]
         public ActionResult Create(string Content, int ForTask, int TaskType)
         {
+            if(Content == null)
+            {
+                return new HttpStatusCodeResult(403);
+            }
+            Content = Content.Trim();
+            if(Content.Length == 0)
+            {
+                return new HttpStatusCodeResult(403);
+            }
             Comment c = this.service.CreateComment(ForTask, Content, this.User.Identity.GetUserId());
             bool added = this.service.AddComment(c, ForTask, TaskType);
             if(added)
@@ -64,15 +73,9 @@ namespace WebTasks.Controllers
             }
         }
 
-        // GET: Comments/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
         // POST: Comments/Delete/5
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Delete(int id, FormCollection collection)
+        public async System.Threading.Tasks.Task<ActionResult> Delete(int id)
         {
             try
             {

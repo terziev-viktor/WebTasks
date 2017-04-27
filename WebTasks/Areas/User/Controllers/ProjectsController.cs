@@ -7,6 +7,7 @@ using WebTasks.Areas.User.Models.ViewModels;
 using WebTasks.Models.BindingModels;
 using WebTasks.Models.ViewModels;
 using Microsoft.AspNet.Identity;
+using System.Collections.Generic;
 
 namespace WebTasks.Areas.User.Controllers
 {
@@ -21,9 +22,26 @@ namespace WebTasks.Areas.User.Controllers
         }
 
         // GET: User/Projects
+        [HttpGet]
         public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
             return View(await this.service.GetUserProjectsToList(filter, page, this.User.Identity.GetUserId()));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Filter(string filter = "", int page = 1)
+        {
+            return PartialView("ProjectsPartial", await this.service.GetUserProjectsToList(filter, page, this.User.Identity.GetUserId()));
+        }
+
+        // User/DailyTasks/Page/5
+        [HttpGet]
+        [Route("Page/{id}")]
+        public async Task<ActionResult> Page(int id)
+        {
+            IEnumerable<ProjectVm> vm = await this.service.GetUserProjectsToList("", id, this.User.Identity.GetUserId());
+
+            return PartialView("ProjectsPartial", vm);
         }
 
         // GET: User/Projects/Details/5
@@ -105,7 +123,7 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
-            this.service.UpdateProject(p, bm);
+            await this.service.Edit(bm);
             return RedirectToAction("Details", new { id = bm.Id });
             
         }

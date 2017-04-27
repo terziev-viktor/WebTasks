@@ -8,13 +8,23 @@ namespace WebTasks
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        "~/Scripts/jquery-{version}.js"));
+                        "~/Scripts/jquery-{version}.js")
+                        .Include("~/Scripts/jquery.unobtrusive-ajax.min.js")
+                        .Include("~/Scripts/noty/jquery.noty.js")
+                        .Include("~/Scripts/noty/themes/*.js")
+                        .Include("~/Scripts/noty/layouts/*.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
             bundles.Add(new ScriptBundle("~/bundles/comments").Include(
                         "~/Scripts/comments.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/dailyTasksPagination").Include(
+                        "~/Scripts/dailyTasksPagination.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/projectsPagination").Include(
+                        "~/Scripts/projectsPagination.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/search").Include(
                         "~/Scripts/search.js"));

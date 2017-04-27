@@ -23,15 +23,34 @@ namespace WebTasks.Areas.Admin.Controllers
             return View(vm);
         }
 
+        public async Task<ActionResult> Filter(string filter = "", int page = 1)
+        {
+            IEnumerable<Project> p = await this.service.GetProjectsToListAsync(filter, page);
+            IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
+
+            return PartialView("ProjectsPartial", vm);
+        }
+
+        [HttpGet]
+        [Route("Page/{id}")]
+        public async Task<ActionResult> Page(int id)
+        {
+            IEnumerable<Project> p = await this.service.GetProjectsToListAsync("", id);
+            IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
+            
+            return PartialView("ProjectsPartial", vm);
+        }
+
         // GET: Admin/Projects/Details/5
         public async Task<ActionResult> Details(int? id)
         {
-            
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             ProjectDetailedAdminVm vm = await this.service.GetProjectDetailedAdminVm(id);
+
             if (vm == null)
             {
                 return HttpNotFound();
@@ -84,14 +103,16 @@ namespace WebTasks.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,ReleaseDate,Plan,Title,Description")] Project project)
+        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Description,Title")] ProjectBm bm)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                this.service.UpdateProject(project);
-                return RedirectToAction("Index");
+                return View(bm);
             }
-            return View(project);
+
+            await this.service.Edit(bm);
+            return RedirectToAction("Details", new { id = bm.Id });
+
         }
 
         // GET: Admin/Projects/Delete/5

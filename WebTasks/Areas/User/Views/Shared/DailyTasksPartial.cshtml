@@ -1,0 +1,40 @@
+﻿@model IEnumerable<WebTasks.Models.ViewModels.DailyTaskVm>
+
+<div class="tb-block">
+    <div class="tb-container" id="tb-container">
+        <table class="table table-striped" id="tb-dailyTasks">
+            <tr>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Note
+                </th>
+                <th>
+                    Number of comments
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Note)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CommentsCount)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

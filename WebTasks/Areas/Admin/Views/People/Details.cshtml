@@ -4,20 +4,12 @@
     ViewBag.Title = "Details";
 }
 
-<h2>Details</h2>
+<h2>Profile of @Model.UserName</h2>
 
 <div>
-    <h4>ApplicationUser</h4>
+    <h4>Profile info</h4>
     <hr />
     <dl class="dl-horizontal">
-
-        <dt>
-            @Html.DisplayNameFor(model => model.UserName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.UserName)
-        </dd>
-
         <dt>
             @Html.DisplayNameFor(model => model.Email)
         </dt>
@@ -39,20 +31,6 @@
         <dd>
             @Html.DisplayFor(model => model.AccessFailedCount)
         </dd>
-        <dt>
-            Number of Projects
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ProjectsCount)
-        </dd>
-
-        <dt>
-            Number of Daily Tasks
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.DailyTasksCount)
-        </dd>
-
         <dt>
             Comments Posted
         </dt>
@@ -91,6 +69,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Note)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CommentsCount)
             </td>
             <td>
                 @Html.ActionLink("Details", "Details", "DailyTasks", new { id = item.Id }, new { })

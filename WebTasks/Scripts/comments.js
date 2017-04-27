@@ -1,4 +1,4 @@
-﻿function postCment(task_id, task_type) {
+﻿function postComment(task_id, task_type) {
     let txt = $('#txtarea-comment').val();
     if (txt === null) {
         return;
@@ -17,8 +17,26 @@
             Content: txt
         },
         success: (result) => {
-            $("#comments-panel").after(result);
-            $('#txtarea-comment').val('');
+            if (result)
+            {
+                $("#comments-panel").after(result);
+                $('#txtarea-comment').val('');
+                noty({
+                    text: "Comment posted successfully!",
+                    type: 'success',
+                    layout: 'topCenter',
+                    timeout: 1000
+                });
+            }
+        }, statusCode: {
+            403: () => {
+                noty({
+                    text: "You cant post an empty comment.",
+                    type: 'warning',
+                    layout: 'topCenter',
+                    timeout: 1000
+                });
+            }
         }
     });
 }
@@ -26,23 +44,4 @@
 function clearTxtArea() {
     $('#txtarea-comment').val('');
     console.log('clicked');
-}
-
-function deleteTask(id) {
-    $.ajax({
-        method: "DELETE",
-        url: "/Comments/Delete",
-        data: {
-            TaskId: id
-        },
-        statusCode: {
-            200: () => {
-                $("#comment-" + id).remove();
-            },
-            401: () => {
-                // TODO: use noty
-                alert("You are Unauthorized to perform this action");
-            }
-        }
-    })
 }

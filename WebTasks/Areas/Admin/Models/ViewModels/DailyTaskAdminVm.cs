@@ -2,7 +2,7 @@
 
 namespace WebTasks.Areas.Admin.Models.ViewModels
 {
-    public class DailyTaskAdimVm
+    public class DailyTaskAdminVm
     {
         public int Id { get; set; }
 

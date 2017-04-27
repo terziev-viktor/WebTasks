@@ -8,6 +8,7 @@ using WebTasks.Models.EntityModels;
 using WebTasks.Models.ViewModels;
 using System.Linq;
 using System;
+using System.Data.Entity.Validation;
 
 namespace WebTasks.Services
 {
@@ -31,14 +32,30 @@ namespace WebTasks.Services
 
         protected int PageSize { get; set; }
 
-        public System.Threading.Tasks.Task SaveChangesAsync()
+        public async System.Threading.Tasks.Task SaveChangesAsync()
         {
-            return this.Context.SaveChangesAsync();
+            try
+            {
+                int x = await this.Context.SaveChangesAsync();
+            }
+            catch (DbEntityValidationException e)
+            {
+                Console.WriteLine(e.EntityValidationErrors);
+                throw;
+            }
         }
 
         public void SaveChanges()
         {
-            this.context.SaveChanges();
+            try
+            {
+                this.context.SaveChanges();
+            }
+            catch (DbEntityValidationException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public void Dispose()
@@ -66,7 +83,7 @@ namespace WebTasks.Services
 
                 x.CreateMap<DailyTaskBm, DailyTask>();
                 
-                x.CreateMap<DailyTask, DailyTaskAdimVm>().AfterMap((a, b) =>
+                x.CreateMap<DailyTask, DailyTaskAdminVm>().AfterMap((a, b) =>
                 {
                     b.CommentsCount = a.Comments.Count();
                     b.Creator = a.Creator.UserName;

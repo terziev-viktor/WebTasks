@@ -25,16 +25,19 @@ namespace WebTasks.Services
             return Mapper.Instance.Map<IEnumerable<Project>, IEnumerable<ProjectVm>>(this.Context.Projects.Where(x => x.Creator.Id == id));
         }
 
-        internal async Task<IEnumerable<Project>> GetUserProjectsToList(string filter, int page, string userId)
+        internal async Task<IEnumerable<ProjectVm>> GetUserProjectsToList(string filter, int page, string userId)
         {
-            return await this.Context.Projects.Where(x => x.Creator.Id == userId && x.Title.Contains(filter))
+            var a = await this.Context.Projects.Where(x => x.Creator.Id == userId && x.Title.Contains(filter))
                 .OrderByDescending(x => x.Id)
                 .Skip((page-1)*PageSize).Take(PageSize).ToListAsync();
+            IEnumerable<ProjectVm> vm = Mapper.Instance.Map<IEnumerable<Project>, IEnumerable<ProjectVm>>(a);
+            return vm;
         }
 
         internal async Task<ProjectDetailedAdminVm> GetProjectDetailedAdminVm(int? id)
         {
             Project p = await this.Context.Projects.FindAsync(id);
+            p.Comments = p.Comments.OrderBy(x => x.PublishDate).ToList();
             return Mapper.Map<ProjectDetailedAdminVm>(p);
         }
 
@@ -83,6 +86,7 @@ namespace WebTasks.Services
         internal ProjectDetailedUserVm GetDetailedVm(Project p)
         {
             ProjectDetailedUserVm vm = Mapper.Map<ProjectDetailedUserVm>(p);
+            vm.Comments = vm.Comments.OrderBy(x => x.PublishDate).ToList();
             return vm;
         }
 
@@ -99,26 +103,17 @@ namespace WebTasks.Services
             return Mapper.Map<ProjectVm>(project);
         }
 
-        internal void UpdateProject(Project p, ProjectBm bm)
+        internal async System.Threading.Tasks.Task Edit(ProjectBm bm)
         {
+            Project p = await this.FindProjectAsync(bm.Id);
             p.Plan = bm.Plan;
             p.Description = bm.Description;
             p.ReleaseDate = bm.ReleaseDate;
             p.Title = bm.Title;
-            this.Context.SaveChanges();
-        }
 
-        internal void UpdateProject(Project p)
-        {
-            this.Context.Entry(p).State = EntityState.Modified;
-            this.Context.SaveChanges();
+            await this.SaveChangesAsync();
         }
-
-        internal void SetEntryState(Project p, EntityState state)
-        {
-            this.Context.Entry(p).State = state;
-        }
-
+        
         internal void RemoveProject(Project project)
         {
             this.Context.Projects.Remove(project);

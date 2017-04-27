@@ -1,10 +1,8 @@
-﻿using System.Data.Entity;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Net;
 using System.Web.Mvc;
 using WebTasks.Models.EntityModels;
 using WebTasks.Models.BindingModels;
-using AutoMapper;
 using WebTasks.Services;
 using WebTasks.Models.ViewModels;
 using System.Collections.Generic;
@@ -18,11 +16,28 @@ namespace WebTasks.Areas.User.Controllers
         private readonly DailyTasksService service = new DailyTasksService();
 
         // GET: User/DailyTasks
-        public ActionResult Index(string filter = "", int page=1)
+        public async Task<ActionResult> Index(string filter = "", int page=1)
         {
             ViewBag.Header = "Your daily tasks";
-            IEnumerable<DailyTaskVm> tasksVm = this.service.GetUserDailyTasksVm(filter, page, this.User.Identity.GetUserId());
+            IEnumerable<DailyTaskVm> tasksVm = await this.service.GetUserDailyTasksVm(filter, page, this.User.Identity.GetUserId());
             return View(tasksVm);
+        }
+
+        public async Task<ActionResult> Filter(string filter = "", int page = 1)
+        {
+            IEnumerable<DailyTaskVm> tasksVm = await this.service.GetUserDailyTasksVm(filter, page, this.User.Identity.GetUserId());
+
+            return PartialView("DailyTasksPartial", tasksVm);
+        }
+
+        // User/DailyTasks/Page/5
+        [HttpGet]
+        [Route("Page/{id}")]
+        public async Task<ActionResult> Page(int id)
+        {
+            IEnumerable<DailyTaskVm> vm = await this.service.GetUserDailyTasksVm("", id, this.User.Identity.GetUserId());
+
+            return PartialView("DailyTasksPartial", vm);
         }
 
         // GET: User/DailyTasks/Details/5
@@ -89,18 +104,18 @@ namespace WebTasks.Areas.User.Controllers
         // POST: User/DailyTasks/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTask dt)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTaskBm bm)
         {
-            if(!this.service.IsOwner(dt.Id, this.User.Identity.GetUserId()) && !this.User.IsInRole("Admin"))
+            if(!this.service.IsOwner(bm.Id, this.User.Identity.GetUserId()) && !this.User.IsInRole("Admin"))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
             if (ModelState.IsValid)
             {
-                await this.service.Edit(dt);
-                return RedirectToAction("Details", new { id = dt.Id});
+                await this.service.Edit(bm);
+                return RedirectToAction("Details", new { id = bm.Id});
             }
-            return View(dt);
+            return View(bm);
         }
 
         // GET: User/DailyTasks/Delete/5

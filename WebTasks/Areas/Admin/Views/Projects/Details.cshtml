@@ -36,7 +36,7 @@
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Creator)
-        </dt>=
+        </dt>
         <dd>
             @Html.DisplayFor(model => model.Creator)
         </dd>
@@ -57,21 +57,18 @@
     <div class="panel-body">
         <textarea id="txtarea-comment" style="width: 100%; min-width: 100%; max-width=100%; margin-bottom: 5px;"></textarea>
         <div class="btn-group">
-            <button class="btn btn-default" onclick="postCment(@Model.Id)">Post</button>
+            <button class="btn btn-default" onclick="postComment(@Model.Id, 1)">Post</button>
             <button class="btn btn-default" onclick="clearTxtArea()">Clear</button>
         </div>
     </div>
 </div>
-@*@{
-    Html.RenderPartial("_PostCommentPartial", new WebTasks.Models.BindingModels.CommentPostBm() { ForTask = Model.Id, TaskType = 1 });
-}*@
 
 @foreach (var item in Model.Comments)
 {
     <div id="comment-@item.Id" class="panel panel-default">
         <div class="panel-heading">
-            <span>@item.Author Published on @item.PublishDate.ToLongDateString()</span>
-            <span class="pull-right"><button class="btn btn-default" onclick="deleteTask(@item.Id)">Delete</button></span>
+            <span>Author @item.Author - Published on: @item.PublishDate.ToLongDateString()</span>
+            @Ajax.ActionLink("Delete", "Delete", "Comments", new { area = "", id=item.Id}, new AjaxOptions() { HttpMethod="POST", UpdateTargetId= "comment-" + @item.Id, OnSuccess="$('#comment-" + item.Id + "').remove()" }, new { @class="pull-right"})
         </div>
         <div class="panel-body">
             <p>@item.Content</p>
@@ -84,4 +81,8 @@
         @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
         @Html.ActionLink("Back to List", "Index")
     </p>
+}
+
+@section scripts {
+    @Scripts.Render("~/bundles/comments")
 }

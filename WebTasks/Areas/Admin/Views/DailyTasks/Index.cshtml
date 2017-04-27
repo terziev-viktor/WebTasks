@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebTasks.Areas.Admin.Models.ViewModels.DailyTaskAdimVm>
+﻿@model IEnumerable<WebTasks.Areas.Admin.Models.ViewModels.DailyTaskAdminVm>
 
 @{
     ViewBag.Title = "Index";
@@ -6,17 +6,16 @@
 
 <h2>Index</h2>
 
-@using (Ajax.BeginForm("Index", "DailyTasks", new { page = 1, filter = "" }, new AjaxOptions
+@using (Ajax.BeginForm("Filter", "DailyTasks", new { page = 1 }, new AjaxOptions
 {   //GetPatients is name of method in PatientController
     InsertionMode = InsertionMode.Replace, //target element(#patientList) will be replaced
-    UpdateTargetId = "tb-dailyTasks",
+    UpdateTargetId = "to-update",
     LoadingElementId = "loader" // div with .gif loader - that is shown when data are loading
 }, new { id = "frmDailyTasks" }))
 {
-    string filter = "";
     <div class="form-group">
         @Html.Label("Search for a task", htmlAttributes: new { @class = "control-label" })
-        @Html.EditorFor(x => filter, new { htmlAttributes = new { @class = "form-control", placeholder = "Type here" } })
+        <input name="filter" class="form-control" placeholder="Type here" />
     </div>
 
     <div class="form-group">
@@ -24,51 +23,19 @@
     </div>
 }
 
-<div id="loader" class=" aletr" style="display:none">
-    Loading...<img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" width="50" height="50" />
-</div>
+@Html.Partial("Loader")
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table table-striped" id="tb-dailyTasks">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Title)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Note)
-        </th>
 
-        <th>
-            @Html.DisplayNameFor(model => model.CommentsCount)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Creator)
-        </th>
-        <th></th>
-    </tr>
+@* Table for daily tasks with pagination *@
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Note)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CommentsCount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Creator)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-            </td>
-        </tr>
-    }
-</table>
+@Scripts.Render("~/bundles/dailyTasksPagination")
+<div id="to-update">
+    @Html.Partial("DailyTasksPartial", Model)
+</div>
+<div class="btn-group">
+    <input type="button" class="btn btn-lg btn-default" value="< Previous Page" onclick="previousPage()" />
+    <input type="button" class="btn btn-lg btn-default" value="Next Page >" onclick="nextPage()" />
+</div>

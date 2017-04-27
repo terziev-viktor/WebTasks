@@ -15,10 +15,24 @@ namespace WebTasks.Areas.Admin.Controllers
         private readonly DailyTasksService service = new DailyTasksService();
 
         // GET: Admin/DailyTasks
-        public ActionResult Index(string filter = "", int page = 1)
+        public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
-            IEnumerable<DailyTaskAdimVm> data = this.service.GetAllDailyTaskVm(filter, page);
+            IEnumerable<DailyTaskAdminVm> data = await this.service.GetAllDailyTaskVm(filter, page);
             return View(data);
+        }
+
+        public async Task<ActionResult> Filter(string filter = "", int page = 1)
+        {
+            IEnumerable<DailyTaskAdminVm> data = await this.service.GetAllDailyTaskVm(filter, page);
+            return PartialView("DailyTasksPartial", data);
+        }
+
+        [HttpGet]
+        [Route("Page/{id}")]
+        public async Task<ActionResult> Page(int id)
+        {
+            IEnumerable<DailyTaskAdminVm> vm = await this.service.GetAllDailyTaskVm("", id);
+            return PartialView("DailyTasksPartial", vm);
         }
 
         // GET: Admin/DailyTasks/Details/5
@@ -80,14 +94,14 @@ namespace WebTasks.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTask dailyTask)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description")] DailyTaskBm bm)
         {
             if (ModelState.IsValid)
             {
-                await this.service.Edit(dailyTask);
-                return RedirectToAction("Details", new { id = dailyTask.Id });
+                await this.service.Edit(bm);
+                return RedirectToAction("Details", new { id = bm.Id });
             }
-            return View(dailyTask);
+            return View(bm);
         }
 
         // GET: Admin/DailyTasks/Delete/5

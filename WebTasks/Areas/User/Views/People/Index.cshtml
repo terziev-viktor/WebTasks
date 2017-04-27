@@ -24,9 +24,8 @@
     </div>
 }
 
-<div id="loader" class=" aletr" style="display:none">
-    Loading...<img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" width="50" height="50" />
-</div>
+@Html.Partial("Loader")
+
 
 @Html.Partial("PeopleTable") @* this is view with patient table. Same view you will return from controller *@
 

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebTasks.Areas.User.Models.ViewModels;
@@ -25,14 +24,15 @@ namespace WebTasks.Services
         {
             var dt = this.Context.DailyTasks.Find(id);
             DailyTaskDetailedAdminVm vm = Mapper.Map<DailyTaskDetailedAdminVm>(dt);
+            vm.Comments = vm.Comments.OrderByDescending(x => x.PublishDate).ToList();
             return vm;
         }
 
-        internal IEnumerable<DailyTaskAdimVm> GetAllDailyTaskVm(string filter, int page)
+        internal async Task<IEnumerable<DailyTaskAdminVm>> GetAllDailyTaskVm(string filter, int page)
         {
-            var dt = this.Context.DailyTasks.ToList();
+            var dt = await this.Context.DailyTasks.Where(x => x.Title.Contains(filter)).ToListAsync();
 
-            var adminVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskAdimVm>>(dt)
+            var adminVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskAdminVm>>(dt)
                 .OrderByDescending(x => x.Id)
                 .Skip(((page - 1) * PageSize)).Take(PageSize);
             
@@ -40,11 +40,11 @@ namespace WebTasks.Services
             
         }
 
-        internal IEnumerable<DailyTaskVm> GetUserDailyTasksVm(string filter, int page, string id)
+        internal async Task<IEnumerable<DailyTaskVm>> GetUserDailyTasksVm(string filter, int page, string id)
         {
             var currentUser = this.UserManager.FindById(id);
 
-            var tasks = this.Context.DailyTasks.Where(x => x.Creator.Id == currentUser.Id && x.Title.Contains(filter)).ToList();
+            var tasks = await this.Context.DailyTasks.Where(x => x.Creator.Id == currentUser.Id && x.Title.Contains(filter)).ToListAsync();
             IEnumerable<DailyTaskVm> tasksVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskVm>>(tasks)
                 .OrderByDescending(x => x.Id)
                 .Skip((page - 1) * PageSize).Take(PageSize);
@@ -73,7 +73,7 @@ namespace WebTasks.Services
                 return null;
             }
             DailyTaskDetailedUserVm vm = Mapper.Map<DailyTaskDetailedUserVm>(dailyTask);
-
+            vm.Comments = vm.Comments.OrderBy(x => x.PublishDate).ToList();
             return vm;
         }
 
@@ -108,9 +108,13 @@ namespace WebTasks.Services
             this.Context.DailyTasks.Remove(dailyTask);
         }
 
-        internal async System.Threading.Tasks.Task Edit(DailyTask dt)
+        internal async System.Threading.Tasks.Task Edit(DailyTaskBm bm)
         {
-            this.Context.Entry(dt).State = EntityState.Modified;
+            DailyTask dt = await this.Context.DailyTasks.FindAsync(bm.Id);
+            dt.Title = bm.Title;
+            dt.Deadline = bm.Deadline;
+            dt.Description = bm.Description;
+            dt.Note = bm.Note;
             
             await this.SaveChangesAsync();
         }
