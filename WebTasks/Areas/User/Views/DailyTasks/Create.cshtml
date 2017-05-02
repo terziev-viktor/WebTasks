@@ -1,4 +1,4 @@
-﻿@model WebTasks.Models.BindingModels.DailyTaskBm
+﻿@model WebTasks.Models.EntityModels.DailyTask
 
 @{
     ViewBag.Title = "Create";
@@ -34,7 +34,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Deadline, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Deadline, new { htmlAttributes = new { @class = "form-control", type="datetime-local" } })
+                @Html.EditorFor(model => model.Deadline, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Deadline, "", new { @class = "text-danger" })
             </div>
         </div>

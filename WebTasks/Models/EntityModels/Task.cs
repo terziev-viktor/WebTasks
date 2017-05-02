@@ -5,19 +5,15 @@ namespace WebTasks.Models.EntityModels
 {
     public class Task
     {
-        public Task()
-        {
-
-        }
         [Key]
         public int Id { get; set; }
 
         [Required]
-        [MinLength(3)]
+        [MinLength(1)]
         [MaxLength(40)]
         public string Title { get; set; }
 
-        [MaxLength(250)]
+        [MaxLength(1000)]
         public string Description { get; set; }
 
         [Required]

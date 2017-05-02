@@ -1,47 +1,58 @@
 ﻿@model IEnumerable<WebTasks.Areas.Admin.Models.ViewModels.ProjectAdminVm>
 
-<div class="tb-block" style="height: 420px;">
-    <div class="tb-container" id="tb-container">
-        <table class="table table-striped" id="tb-projects">
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Title)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ReleaseDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CommentsCount)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Creator)
-                </th>
-                <th></th>
-            </tr>
-
-            @foreach (var item in Model)
-            {
+@if (Model.Count() > 0)
+{
+    <div class="tb-block" style="height: 420px;">
+        <div class="tb-container" id="tb-container">
+            <table class="table table-striped" id="tb-projects">
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Title)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ReleaseDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CommentsCount)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Creator)
-                    </td>
-                    <td>
-                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                    </td>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReleaseDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CommentsCount)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Creator)
+                    </th>
+                    <th></th>
                 </tr>
-            }
 
-        </table>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ReleaseDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CommentsCount)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Creator)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        </div>
     </div>
-</div>
+}
+else
+{
+    <div class="container">
+        <h3>No Results...</h3>
+    </div>
+}
+
+@Html.Partial("PaginationPartial")

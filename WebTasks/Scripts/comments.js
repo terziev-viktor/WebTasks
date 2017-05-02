@@ -36,6 +36,16 @@
                     layout: 'topCenter',
                     timeout: 1000
                 });
+            },
+            500: (err) => {
+                console.log(err);
+
+                noty({
+                    text: "An error has accured while processing your request",
+                    type: 'warning',
+                    layout: 'topCenter',
+                    timeout: 1000
+                });
             }
         }
     });

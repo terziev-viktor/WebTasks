@@ -8,7 +8,7 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse nomargin">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -19,17 +19,27 @@
                 @Html.ActionLink("WebTasks", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("All Daily Tasks", "Index", "DailyTasks", new { filter = "", page = 1 }, new { })</li>
-                    <li>@Html.ActionLink("All Projects", "Index", "Projects", new { filter = "", page = 1 }, new { })</li>
-                    <li>@Html.ActionLink("All Users", "Index", "People", new { filter = "", page = 1 }, new { })</li>
-                </ul>
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>
-
-    <div class="container body-content">
+    <nav class="navbar navbar-inverse sidebar" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" id="sidebar-header" href="#">Menu</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="navbar-collapse collapse" id="bs-sidebar-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="/Admin/DailyTasks/Index">All Daily Tasks<span style="font-size:16px;" class="pull-right showopacity glyphicon glyphicon-list-alt"></span></a></li>
+                    <li><a href="/Admin/Projects/Index">All Projects<span style="font-size:16px;" class="pull-right showopacity glyphicon glyphicon-th-list"></span></a></li>
+                    <li><a href="/Admin/People/Index">All Users<span style="font-size:16px;" class="pull-right showopacity glyphicon glyphicon-star"></span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="main">
         @RenderBody()
         <hr />
         <footer>

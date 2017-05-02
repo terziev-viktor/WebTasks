@@ -1,0 +1,25 @@
+﻿@* Pagination *@
+<div class="btn-group">
+    @if (!ViewBag.IsFirstPage)
+    {
+        <button class="btn btn-default">
+            @Ajax.ActionLink("Previous Page", "Page", new { page = ViewBag.CurrentPage - 1 }, new AjaxOptions()
+       {
+           InsertionMode = InsertionMode.Replace,
+           UpdateTargetId = "to-update"
+       })
+
+        </button>
+    }
+
+    @if (!ViewBag.IsLastPage)
+    {
+        <button class="btn btn-default">
+            @Ajax.ActionLink("Next Page", "Page", new { page = ViewBag.CurrentPage + 1 }, new AjaxOptions()
+       {
+           InsertionMode = InsertionMode.Replace,
+           UpdateTargetId = "to-update"
+       })
+        </button>
+    }
+</div>

@@ -1,14 +1,27 @@
 ﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using System.Web.Mvc;
+using WebTasks.Filters;
+using WebTasks.Helpers;
+using WebTasks.Models;
+using WebTasks.Models.BindingModels;
 using WebTasks.Models.EntityModels;
 using WebTasks.Models.ViewModels;
 using WebTasks.Services;
+using WebTasks.Services.Interfaces;
 
 namespace WebTasks.Controllers
 {
     public class CommentsController : Controller
     {
-        private readonly CommentsService service = new CommentsService();
+        private readonly ICommentsService service;
+        private ApplicationUserManager _userManager;
+
+        public CommentsController(ICommentsService s)
+        {
+            this.service = s;
+            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.service.Context as ApplicationDbContext));
+        }
 
         // GET: Comments
         [Authorize(Roles = "Admin")]
@@ -27,22 +40,22 @@ namespace WebTasks.Controllers
         // POST: Comments/Create
         [HttpPost]
         [Authorize]
+        [ValidateInput(false)]
         public ActionResult Create(string Content, int ForTask, int TaskType)
         {
-            if(Content == null)
+            if (Content == null)
             {
                 return new HttpStatusCodeResult(403);
             }
-            Content = Content.Trim();
-            if(Content.Length == 0)
+            string contentHtmlEncoded = HtmlSerializer.ToHtmlString(Content);
+            if (contentHtmlEncoded.Length == 0)
             {
                 return new HttpStatusCodeResult(403);
             }
-            Comment c = this.service.CreateComment(ForTask, Content, this.User.Identity.GetUserId());
-            bool added = this.service.AddComment(c, ForTask, TaskType);
-            if(added)
+            Comment added = this.service.Add(contentHtmlEncoded, ForTask, TaskType, this._userManager.FindById(this.User.Identity.GetUserId()));
+            if (added != null)
             {
-                CommentVm vm = this.service.GetCommentVm(c);
+                CommentVm vm = this.service.GetVm(added);
                 return PartialView("CommentPosted", vm);
             }
 
@@ -53,39 +66,40 @@ namespace WebTasks.Controllers
         [Authorize(Roles = "Admin")]
         public ActionResult Edit(int id)
         {
-            return View();
+            Comment c = this.service.GetComment(id);
+            return View(c);
         }
 
         // POST: Comments/Edit/5
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public ActionResult Edit(int id, FormCollection collection)
+        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id, Content")] CommentBm bm)
         {
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                await this.service.Edit(bm);
+                
+                return new HttpStatusCodeResult(304);
             }
             catch
             {
-                return View();
+                return new HttpStatusCodeResult(500);
             }
         }
 
         // POST: Comments/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async System.Threading.Tasks.Task<ActionResult> Delete(int id)
         {
             try
             {
-                if (this.User.IsInRole("Admin"))
-                await this.service.DeleteCommentAsync(id);
+                await this.service.DeleteAsync(id);
                 return new HttpStatusCodeResult(200);
             }
             catch
             {
-                return new HttpStatusCodeResult(401);
+                return new HttpStatusCodeResult(500);
             }
         }
     }

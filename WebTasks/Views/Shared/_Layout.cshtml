@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse nomargin">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -19,36 +19,35 @@
                 </button>
                 @Html.ActionLink("Web Tasks", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    @*<li>@Html.ActionLink("User Area", "Index", "DailyTasks", new { area="User", filter = "", page = 1 })</li>
-                    <li>@Html.ActionLink("Admin Area", "Index", "DailyTasks", new { area = "Admin", filter = "", page = 1 })</li>*@
-                </ul>
+            <div class="navbar-collapse collapse"  id="bs-sidebar-navbar-collapse-1">
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>
-    <div class="container body-content">
+    <nav class="navbar navbar-inverse sidebar" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" id="sidebar-header" href="#">Menu</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="navbar-collapse collapse" id="bs-sidebar-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="/Home/Index">Home<span style="font-size:16px;" class="pull-right showopacity glyphicon glyphicon-list-alt"></span></a></li>
+                    <li><a href="/Home/About">About<span style="font-size:16px;" class="pull-right showopacity glyphicon glyphicon-question-sign"></span></a></li>
+                    <li><a href="/Home/Contact">Contact<span style="font-size:16px;" class="pull-right showopacity glyphicon glyphicon-phone"></span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main">
         @RenderBody()
         <hr />
-        <footer class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                <p>&copy; @DateTime.Now.Year Web Tasks Application</p>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                <p>Project for C# MVC Frameworks - ASP.NET - march 2017</p>
-            </div>
-
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                <p>Created by a softuni student</p>
-            </div>
-            
+        <footer>
+            <p>&copy; @DateTime.Now.Year WebTasks 2017</p>
         </footer>
     </div>
-
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)

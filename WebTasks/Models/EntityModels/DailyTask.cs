@@ -15,6 +15,7 @@ namespace WebTasks.Models.EntityModels
         public string Note { get; set; }
 
         [Required]
+        [DataType(DataType.Time)]
         public DateTime Deadline { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; }

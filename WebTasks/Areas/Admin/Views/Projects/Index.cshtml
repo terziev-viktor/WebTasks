@@ -1,14 +1,16 @@
 ﻿@model IEnumerable<WebTasks.Areas.Admin.Models.ViewModels.ProjectAdminVm>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Projects";
+    ViewBag.CurrentPage = 1;
 }
 
-<h2>Index</h2>
+<h2>All Projects in the application</h2>
 
 @using (Ajax.BeginForm("Filter", "Projects", new { page = 1, filter = "" }, new AjaxOptions
-{   //GetPatients is name of method in PatientController
-    InsertionMode = InsertionMode.Replace, //target element(#patientList) will be replaced
+{   
+    HttpMethod = "GET",
+    InsertionMode = InsertionMode.Replace,
     UpdateTargetId = "to-update",
     LoadingElementId = "loader" // div with .gif loader - that is shown when data are loading
 }, new { id = "frmDailyTasks" }))
@@ -32,11 +34,8 @@
 </p>
 
 @* Table for projects with pagination *@
-@Scripts.Render("~/bundles/projectsPagination")
+
 <div id="to-update">
     @Html.Partial("ProjectsPartial", Model)
 </div>
-<div class="btn-group">
-    <input type="button" class="btn btn-lg btn-default" value="< Previous Page" onclick="previousPage()" />
-    <input type="button" class="btn btn-lg btn-default" value="Next Page >" onclick="nextPage()" />
-</div>
+

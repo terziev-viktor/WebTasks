@@ -13,9 +13,10 @@ namespace WebTasks.Models.EntityModels
         }
 
         [Required]
+        [DataType(DataType.Date)]
         public DateTime ReleaseDate { get; set; }
 
-        [MaxLength(5000)]
+        [MaxLength(1000)]
         public string Plan { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; }

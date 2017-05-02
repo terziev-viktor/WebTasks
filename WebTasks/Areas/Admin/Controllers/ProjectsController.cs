@@ -6,25 +6,53 @@ using WebTasks.Services;
 using System.Collections.Generic;
 using WebTasks.Areas.Admin.Models.ViewModels;
 using WebTasks.Models.BindingModels;
+using WebTasks.Services.Interfaces;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using WebTasks.Models;
+using WebTasks.Filters;
+using System.Linq;
 
 namespace WebTasks.Areas.Admin.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class ProjectsController : Controller
     {
-        private readonly ProjectsService service = new ProjectsService();
+        private readonly IProjectsService service;
+        private ApplicationUserManager _userManager;
+
+        public ProjectsController()
+        {
+
+        }
+
+        public ProjectsController(IProjectsService s)
+        {
+            this.service = s;
+            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.service.Context as ApplicationDbContext));
+        }
 
         // GET: Admin/Projects
         public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
+            ViewBag.CurrentPage = page;
+            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsFirstPage = true;
+
             IEnumerable<Project> p = await this.service.GetProjectsToListAsync(filter, page);
             IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
 
             return View(vm);
         }
 
+        [ValidateInput(false)]
+        [RequestQuerySerializer]
         public async Task<ActionResult> Filter(string filter = "", int page = 1)
         {
+            ViewBag.CurrentPage = page;
+            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsFirstPage = true;
+
             IEnumerable<Project> p = await this.service.GetProjectsToListAsync(filter, page);
             IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
 
@@ -32,10 +60,14 @@ namespace WebTasks.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Route("Page/{id}")]
-        public async Task<ActionResult> Page(int id)
+        [Route("Page/{page}")]
+        public async Task<ActionResult> Page(int page)
         {
-            IEnumerable<Project> p = await this.service.GetProjectsToListAsync("", id);
+            ViewBag.CurrentPage = page;
+            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsFirstPage = page == 1;
+
+            IEnumerable<Project> p = await this.service.GetProjectsToListAsync("", page);
             IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
             
             return PartialView("ProjectsPartial", vm);
@@ -73,7 +105,7 @@ namespace WebTasks.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                await this.service.AddProjectAsync(bm, this.User.Identity.Name);
+                await this.service.AddAsync(bm, this._userManager.FindById(this.User.Identity.GetUserId()));
                 
                 return RedirectToAction("Index");
             }
@@ -88,14 +120,13 @@ namespace WebTasks.Areas.Admin.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await this.service.FindProjectAsync(id);
-            ProjectAdminVm vm = this.service.MapToProjectAdminVm(project);
+            Project project = await this.service.FindAsync(id);
 
             if (project == null)
             {
                 return HttpNotFound();
             }
-            return View(vm);
+            return View(project);
         }
 
         // POST: Admin/Projects/Edit/5
@@ -103,7 +134,7 @@ namespace WebTasks.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Description,Title")] ProjectBm bm)
+        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Description,Title,EditedReleaseDate")] ProjectBm bm)
         {
             if (!ModelState.IsValid)
             {
@@ -122,7 +153,7 @@ namespace WebTasks.Areas.Admin.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await this.service.FindProjectAsync(id);
+            Project project = await this.service.FindAsync(id);
             ProjectAdminVm vm = this.service.MapToProjectAdminVm(project);
 
             if (project == null)
@@ -137,19 +168,9 @@ namespace WebTasks.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Project project = await this.service.FindProjectAsync(id);
-            this.service.RemoveProject(project);
-            await this.service.SaveChangesAsync();
+            Project project = await this.service.FindAsync(id);
+            await this.service.RemoveAsync(project);
             return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                this.service.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

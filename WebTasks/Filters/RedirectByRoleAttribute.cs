@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using WebTasks.Utils;
+using WebTasks.Enums;
 
 namespace WebTasks.Filters
 {

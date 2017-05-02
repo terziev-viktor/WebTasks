@@ -9,6 +9,8 @@ namespace WebTasks.Areas.Admin.Models.ViewModels
 
         public string UserName { get; set; }
 
+        public bool IsAdmin { get; set; }
+
         public string Email { get; set; }
 
         public int TasksCount { get; set; }

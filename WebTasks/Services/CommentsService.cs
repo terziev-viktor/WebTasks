@@ -7,95 +7,99 @@ using System.Data.Entity;
 using WebTasks.Models.BindingModels;
 using WebTasks.Models.ViewModels;
 using Microsoft.AspNet.Identity;
+using WebTasks.Models.Interfaces;
+using WebTasks.Services.Interfaces;
+using WebTasks.Enums;
+using WebTasks.Models;
 
 namespace WebTasks.Services
 {
-    public class CommentsService : Service
+    public class CommentsService : Service, ICommentsService
     {
-        public CommentsService()
-            : base(10)
+        public async System.Threading.Tasks.Task Edit(CommentBm bm)
         {
-
+            Comment c = this.Context.Comments.Find(bm.Id);
+            c.Content = bm.Content;
+            await this.SaveChangesAsync();
         }
 
-        internal IEnumerable<Comment> GetAllComments()
+        public CommentsService(IApplicationDbContext context)
+            : base(context, 10)
+        {   }
+
+        public IEnumerable<Comment> GetAllComments()
         {
             return this.Context.Comments.ToList();
         }
 
-        internal Comment FindComment(int id)
+        public Comment Find(int id)
         {
             return this.Context.Comments.Find(id);
         }
 
-        internal CommentVm GetCommentVm(int id)
+        public CommentVm GetVm(int id)
         {
             Comment c = this.Context.Comments.Find(id);
             return Mapper.Map<CommentVm>(c);
         }
 
-        internal CommentVm GetCommentVm(Comment c)
+        public CommentVm GetVm(Comment c)
         {
             return Mapper.Map<CommentVm>(c);
         }
 
-        internal void UpdateTask(Comment comment, EntityState es)
-        {
-            this.Context.Entry(comment).State = es;
-        }
-
-        internal Comment MapComment(CommentBm bm)
-        {
-            return Mapper.Instance.Map<CommentBm, Comment>(bm);
-        }
-
-        internal bool AddComment(Comment c, int fortask, int taskType)
+        public Comment Add(string content, int fortask, int taskType, ApplicationUser author)
         {
             if (taskType == 0)
             {
                 var dt = this.Context.DailyTasks.Find(fortask);
+                Comment c = new Comment()
+                {
+                    Content = content,
+                    PublishDate = DateTime.Now,
+                    Author = author
+                };
                 dt.Comments.Add(c);
                 this.SaveChanges();
-                return true;
+                return c;
             }
             else if(taskType == 1)
             {
                 var p = this.Context.Projects.Find(fortask);
+                Comment c = new Comment()
+                {
+                    Content = content,
+                    PublishDate = DateTime.Now,
+                    Author = author
+                };
                 p.Comments.Add(c);
                 this.SaveChanges();
-                return true;
+                return c;
             }
             
-            return false;
+            return null;
         }
 
-        internal void RemoveComment(Comment c)
-        {
-            this.Context.Comments.Remove(c);
-        }
-
-        internal bool Exists(int id)
+        public bool Exists(int id)
         {
             return this.Context.Comments.Count(x => x.Id == id) > 0;
         }
 
-        internal async System.Threading.Tasks.Task<int> DeleteCommentAsync(int id)
+        public void Delete(Comment c)
+        {
+            this.Context.Comments.Remove(c);
+        }
+
+        public async System.Threading.Tasks.Task<int> DeleteAsync(int id)
         {
             var c = this.Context.Comments.Find(id);
             this.Context.Comments.Remove(c);
             return await this.Context.SaveChangesAsync();
         }
 
-        internal Comment CreateComment(int forTask, string content, string id)
+        public Comment GetComment(int id)
         {
-            Comment c = new Comment()
-            {
-                Content = content,
-                PublishDate = DateTime.Now,
-                Author = this.UserManager.FindById(id)
-            };
-
-            return c;
+            return this.Context.Comments.Find(id);
         }
     }
 }

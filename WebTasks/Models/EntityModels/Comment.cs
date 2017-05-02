@@ -8,13 +8,15 @@ namespace WebTasks.Models.EntityModels
     {
         [Key]
         public int Id { get; set; }
-        
+
+        [StringLength(500, ErrorMessage = "The comment can not be empty.", MinimumLength = 1)]
         public string Content { get; set; }
 
         [Required]
         public virtual ApplicationUser Author { get; set; }
 
         [Required]
+        [DataType(DataType.DateTime)]
         public DateTime PublishDate { get; set; }
 
         [ForeignKey("Project")]

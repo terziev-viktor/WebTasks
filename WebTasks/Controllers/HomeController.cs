@@ -1,9 +1,10 @@
 ﻿using System.Web.Mvc;
 using WebTasks.Filters;
-using WebTasks.Utils;
+using WebTasks.Enums;
 
 namespace WebTasks.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private ActionResult RedirectByRole()
@@ -26,7 +27,7 @@ namespace WebTasks.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            ViewBag.Message = "WebTasks";
 
             return View();
         }

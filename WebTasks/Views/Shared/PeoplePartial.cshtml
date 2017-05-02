@@ -1,0 +1,61 @@
+﻿@model IEnumerable<WebTasks.Models.ViewModels.PersonVm>
+
+@if (Model.Count() > 0)
+{
+    <div class="tb-block">
+        <div class="tb-container" id="tb-container">
+            <table class="table table-striped" id="tb-people">
+                <tr>
+                    <th>
+                        Username
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        Daily Tasks
+                    </th>
+                    <th>
+                        Projects
+                    </th>
+                    <th>
+                        Is Admin
+                    </th>
+                    <th></th>
+                </tr>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DailyTasksCount)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProjectsCount)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(modelItem => item.IsAdmin, new { disabled="disabled"})
+                        </td>
+                        <td>
+                            @Html.ActionLink("View Account", "Details", new { username = item.UserName})
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container">
+        <h3>No Results...</h3>
+    </div>
+}
+
+@Html.Partial("PaginationPartial")

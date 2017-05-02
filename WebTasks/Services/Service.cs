@@ -9,29 +9,23 @@ using WebTasks.Models.ViewModels;
 using System.Linq;
 using System;
 using System.Data.Entity.Validation;
+using WebTasks.Models.Interfaces;
 
 namespace WebTasks.Services
 {
-    public class Service : IDisposable
+    public abstract class Service
     {
-        private ApplicationDbContext context;
-
-        private ApplicationUserManager userManager;
-
-        protected Service(int pageSize)
+        protected Service(IApplicationDbContext context, int pageSize)
         {
             this.PageSize = pageSize;
-            this.context = new ApplicationDbContext();
-            userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.context));
+            this.Context = context;
             this.InitAutoMapper();
         }
 
-        protected ApplicationDbContext Context => this.context;
-
-        protected ApplicationUserManager UserManager => this.userManager;
+        public IApplicationDbContext Context { get; set; }
 
         protected int PageSize { get; set; }
-
+        
         public async System.Threading.Tasks.Task SaveChangesAsync()
         {
             try
@@ -49,18 +43,13 @@ namespace WebTasks.Services
         {
             try
             {
-                this.context.SaveChanges();
+                this.Context.SaveChanges();
             }
             catch (DbEntityValidationException e)
             {
                 Console.WriteLine(e);
-                throw;
+                throw e;
             }
-        }
-
-        public void Dispose()
-        {
-            this.Context.Dispose();
         }
 
         private void InitAutoMapper()
@@ -76,7 +65,6 @@ namespace WebTasks.Services
                     .AfterMap((a, b) =>
                     {
                         b.CommentsCount = a.Comments.Count();
-                        b.Creator_Name = a.Creator.UserName;
                     });
 
                 x.CreateMap<DailyTask, DailyTaskVm>();
@@ -121,7 +109,7 @@ namespace WebTasks.Services
                 // Application User Vm
                 x.CreateMap<ApplicationUser, PersonDetailedAdminVm>().AfterMap((a, b) =>
                 {
-                    b.CommentsCount = this.context.Comments.Count(c => c.Author.Id == b.Id);
+                    b.CommentsCount = this.Context.Comments.Count(c => c.Author.Id == b.Id);
                 });
 
                 x.CreateMap<ApplicationUser, PersonVm>().AfterMap((a, b) =>

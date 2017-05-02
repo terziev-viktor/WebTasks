@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using WebTasks.Models.EntityModels;
+using WebTasks.Models.Interfaces;
+using System.Data.Entity.ModelConfiguration.Conventions;
 
 namespace WebTasks.Models
 {
@@ -16,7 +18,7 @@ namespace WebTasks.Models
         }
     }
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
         public ApplicationDbContext()
             : base("WebTasks")
@@ -36,8 +38,10 @@ namespace WebTasks.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DailyTask>().HasMany(x => x.Comments).WithOptional().WillCascadeOnDelete(false);
-            modelBuilder.Entity<Project>().HasMany(x => x.Comments).WithOptional().WillCascadeOnDelete(false);
+            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+
+            modelBuilder.Entity<DailyTask>().HasMany(x => x.Comments).WithOptional().WillCascadeOnDelete(true);
+            modelBuilder.Entity<Project>().HasMany(x => x.Comments).WithOptional().WillCascadeOnDelete(true);
 
             modelBuilder.Entity<Comment>().HasOptional<DailyTask>(x => x.DailyTask).WithMany().WillCascadeOnDelete(false);
             modelBuilder.Entity<Comment>().HasOptional<Project>(x => x.Project).WithMany().WillCascadeOnDelete(false);

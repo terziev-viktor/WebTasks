@@ -2,15 +2,17 @@
 
 @{
     ViewBag.Title = "People";
+    ViewBag.CurrentPage = 1;
 }
 
 <h2>Find People</h2>
 
-@using (Ajax.BeginForm("Index", "People", new { page = 1, filter = "" }, new AjaxOptions
+@using (Ajax.BeginForm("Filter", "People", new { page = 1, filter = "" }, new AjaxOptions
 {  
+    HttpMethod = "GET",
     InsertionMode = InsertionMode.Replace, 
     UpdateTargetId = "tb-people",
-    LoadingElementId = "loader" // div with .gif loader - that is shown when data are loading
+    LoadingElementId = "loader"
 }))
 {
     string filter = "";
@@ -26,6 +28,4 @@
 
 @Html.Partial("Loader")
 
-
-@Html.Partial("PeopleTable") @* this is view with patient table. Same view you will return from controller *@
-
+@Html.Partial("PeoplePartial", Model)

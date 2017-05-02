@@ -13,6 +13,8 @@ namespace WebTasks.Models.BindingModels
 
         public DateTime ReleaseDate { get; set; }
 
+        public DateTime? EditedReleaseDate { get; set; }
+
         public string Description { get; set; }
 
         public string Plan { get; set; }

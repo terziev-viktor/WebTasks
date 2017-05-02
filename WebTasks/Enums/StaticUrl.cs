@@ -1,4 +1,4 @@
-﻿namespace WebTasks.Utils
+﻿namespace WebTasks.Enums
 {
     public class StaticUrl
     {

@@ -2,44 +2,68 @@
 using System.Net;
 using System.Web.Mvc;
 using WebTasks.Models.EntityModels;
-using WebTasks.Services;
 using WebTasks.Areas.User.Models.ViewModels;
 using WebTasks.Models.BindingModels;
 using WebTasks.Models.ViewModels;
 using Microsoft.AspNet.Identity;
 using System.Collections.Generic;
+using WebTasks.Services.Interfaces;
+using Microsoft.AspNet.Identity.EntityFramework;
+using WebTasks.Models;
+using WebTasks.Filters;
+using WebTasks.Helpers;
+using System.Linq;
 
 namespace WebTasks.Areas.User.Controllers
 {
     [Authorize]
     public class ProjectsController : Controller
     {
-        private ProjectsService service;
+        private IProjectsService service;
+        private ApplicationUserManager _userManager;
 
-        public ProjectsController()
+        public ProjectsController(IProjectsService s)
         {
-            this.service = new ProjectsService();
+            this.service = s;
+            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.service.Context as ApplicationDbContext));
+
         }
 
         // GET: User/Projects
         [HttpGet]
+
         public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
-            return View(await this.service.GetUserProjectsToList(filter, page, this.User.Identity.GetUserId()));
+            ViewBag.CurrentPage = page;
+            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsFirstPage = true;
+
+            return View(await this.service.GetUserProjectsToList(filter, page, this._userManager.FindById(this.User.Identity.GetUserId())));
         }
 
         [HttpGet]
+        [ValidateInput(false)]
         public async Task<ActionResult> Filter(string filter = "", int page = 1)
         {
-            return PartialView("ProjectsPartial", await this.service.GetUserProjectsToList(filter, page, this.User.Identity.GetUserId()));
+            ViewBag.CurrentPage = page;
+            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsFirstPage = true;
+
+            string encoded = HtmlSerializer.ToHtmlString(filter);
+
+            return PartialView("ProjectsPartial", await this.service.GetUserProjectsToList(encoded, page, this._userManager.FindById(this.User.Identity.GetUserId())));
         }
 
         // User/DailyTasks/Page/5
         [HttpGet]
-        [Route("Page/{id}")]
-        public async Task<ActionResult> Page(int id)
+        [Route("Page/{page}")]
+        public async Task<ActionResult> Page(int page)
         {
-            IEnumerable<ProjectVm> vm = await this.service.GetUserProjectsToList("", id, this.User.Identity.GetUserId());
+            ViewBag.CurrentPage = page;
+            ViewBag.IsFirstPage = page == 1;
+
+            IEnumerable<ProjectVm> vm = await this.service.GetUserProjectsToList("", page, this._userManager.FindById(this.User.Identity.GetUserId()));
+            ViewBag.IsLastPage = page * 10 >= this.service.GetUserProjectsCount(this.User.Identity.GetUserId());
 
             return PartialView("ProjectsPartial", vm);
         }
@@ -51,7 +75,7 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project p = await this.service.FindProjectAsync(id);
+            Project p = await this.service.FindAsync(id);
 
             if (p == null)
             {
@@ -76,8 +100,7 @@ namespace WebTasks.Areas.User.Controllers
         {
             if (ModelState.IsValid)
             {
-                this.service.AddProject(bm, this.User.Identity.GetUserId());
-                await this.service.SaveChangesAsync();
+                await this.service.AddAsync(bm, this._userManager.FindById(this.User.Identity.GetUserId()));
                 return RedirectToAction("Index");
             }
 
@@ -91,25 +114,24 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await service.FindProjectAsync(id);
-            if(project.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
-            }
+            Project project = await service.FindAsync(id);
+
             if (project == null)
             {
                 return HttpNotFound();
             }
-
-            ProjectVm vm = this.service.GetProjectVm(project);
-
-            return View(vm);
+            if (project.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
+            }
+            
+            return View(project);
         }
 
         // POST: User/Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Description,Title")] ProjectBm bm)
+        public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Description,Title,EditedReleaseDate")] ProjectBm bm)
         {
             
             if (!ModelState.IsValid)
@@ -117,7 +139,7 @@ namespace WebTasks.Areas.User.Controllers
                 return View(bm);
             }
 
-            Project p = await this.service.FindProjectAsync(bm.Id);
+            Project p = await this.service.FindAsync(bm.Id);
 
             if(p.Creator.Id != this.User.Identity.GetUserId() && this.User.IsInRole("Admin"))
             {
@@ -135,7 +157,7 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project p = await this.service.FindProjectAsync(id);
+            Project p = await this.service.FindAsync(id);
             if (p == null)
             {
                 return HttpNotFound();
@@ -154,19 +176,13 @@ namespace WebTasks.Areas.User.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Project project = await this.service.FindProjectAsync(id);
-            this.service.RemoveProject(project);
-            await this.service.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
+            Project project = await this.service.FindAsync(id);
+            if(project == null)
             {
-                this.service.Dispose();
+                return HttpNotFound();
             }
-            base.Dispose(disposing);
+            await this.service.RemoveAsync(project);
+            return RedirectToAction("Index");
         }
     }
 }
