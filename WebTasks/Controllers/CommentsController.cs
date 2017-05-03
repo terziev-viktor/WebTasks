@@ -14,20 +14,25 @@ namespace WebTasks.Controllers
 {
     public class CommentsController : Controller
     {
-        private readonly ICommentsService service;
-        private ApplicationUserManager _userManager;
+        public ICommentsService Service;
+        public ApplicationUserManager UserManager;
+
+        public CommentsController()
+        {
+
+        }
 
         public CommentsController(ICommentsService s)
         {
-            this.service = s;
-            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.service.Context as ApplicationDbContext));
+            this.Service = s;
+            this.UserManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.Service.Context as ApplicationDbContext));
         }
 
         // GET: Comments
         [Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
-            return View();
+            return View(this.Service.GetAllComments());
         }
 
         // GET: Comments/Details/5
@@ -52,10 +57,10 @@ namespace WebTasks.Controllers
             {
                 return new HttpStatusCodeResult(403);
             }
-            Comment added = this.service.Add(contentHtmlEncoded, ForTask, TaskType, this._userManager.FindById(this.User.Identity.GetUserId()));
+            Comment added = this.Service.Add(contentHtmlEncoded, ForTask, TaskType, this.UserManager.FindById(this.User.Identity.GetUserId()));
             if (added != null)
             {
-                CommentVm vm = this.service.GetVm(added);
+                CommentVm vm = this.Service.GetVm(added);
                 return PartialView("CommentPosted", vm);
             }
 
@@ -66,7 +71,7 @@ namespace WebTasks.Controllers
         [Authorize(Roles = "Admin")]
         public ActionResult Edit(int id)
         {
-            Comment c = this.service.GetComment(id);
+            Comment c = this.Service.GetComment(id);
             return View(c);
         }
 
@@ -77,7 +82,7 @@ namespace WebTasks.Controllers
         {
             try
             {
-                await this.service.Edit(bm);
+                await this.Service.Edit(bm);
                 
                 return new HttpStatusCodeResult(304);
             }
@@ -94,7 +99,7 @@ namespace WebTasks.Controllers
         {
             try
             {
-                await this.service.DeleteAsync(id);
+                await this.Service.DeleteAsync(id);
                 return new HttpStatusCodeResult(200);
             }
             catch

@@ -414,6 +414,7 @@
     <Content Include="Views\Shared\Loader.cshtml" />
     <Content Include="Views\Shared\PotentialXSS.cshtml" />
     <Content Include="Views\Shared\PaginationPartial.cshtml" />
+    <Content Include="Views\Comments\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Projects\" />
