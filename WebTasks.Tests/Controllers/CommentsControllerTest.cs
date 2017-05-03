@@ -6,16 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using WebTasks.Controllers;
 using WebTasks.Models;
 using WebTasks.Models.EntityModels;
-using WebTasks.Models.Interfaces;
 using WebTasks.Models.ViewModels;
-using WebTasks.Services;
 using WebTasks.Services.Interfaces;
 
 namespace WebTasks.Tests.Controllers
@@ -130,9 +126,9 @@ namespace WebTasks.Tests.Controllers
                                  .Returns(contextMock.Object);
 
             var controller = new CommentsController();
-            var userStoreMock = new Mock<UserStore<ApplicationUser>>(controllerContextMock.Object);
             var serviceMock = new Mock<ICommentsService>();
-            var userManagerMock = new Mock<ApplicationUserManager>();
+            var userStoreMock = new Mock<UserStore<ApplicationUser>>(controllerContextMock.Object);
+            var userManagerMock = new Mock<ApplicationUserManager>(userStoreMock.Object);
             userManagerMock.Setup(x => x.FindById(It.IsAny<string>())).Returns(UserA);
             controller.UserManager = userManagerMock.Object;
 

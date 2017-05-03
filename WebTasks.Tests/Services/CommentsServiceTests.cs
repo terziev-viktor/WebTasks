@@ -7,10 +7,6 @@ using WebTasks.Services;
 
 namespace WebTasks.Tests.Services
 {
-    //IEnumerable<Comment> GetAllComments();
-
-
-
     [TestClass]
     public class CommentsServiceTests : TestClass
     {
@@ -21,7 +17,6 @@ namespace WebTasks.Tests.Services
         {
             InitContext();
             this.service = new CommentsService(context);
-
         }
 
         [TestMethod]
