@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title = "Daily Tasks";
-    ViewBag.CurrentPage = 1;
 }
 
 <h2>@ViewBag.Header</h2>
@@ -15,10 +14,9 @@
     LoadingElementId = "loader" // div with .gif loader - that is shown when data are loading
 }, new { id = "frmDailyTasks" }))
 {
-    string filter = "";
     <div class="form-group">
         @Html.Label("Search for a task", htmlAttributes: new { @class = "control-label" })
-        @Html.EditorFor(x => filter, new { htmlAttributes = new { @class = "form-control", placeholder = "Type here" } })
+        <input name="filter" class="form-control" placeholder="Type here" />
     </div>
 
     <div class="form-group">

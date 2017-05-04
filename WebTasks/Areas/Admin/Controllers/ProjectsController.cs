@@ -18,43 +18,40 @@ namespace WebTasks.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class ProjectsController : Controller
     {
-        private readonly IProjectsService service;
+        public IProjectsService Service;
         private ApplicationUserManager _userManager;
 
         public ProjectsController()
-        {
-
-        }
+        {   }
 
         public ProjectsController(IProjectsService s)
         {
-            this.service = s;
-            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.service.Context as ApplicationDbContext));
+            this.Service = s;
+            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.Service.Context as ApplicationDbContext));
         }
 
         // GET: Admin/Projects
         public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
             ViewBag.CurrentPage = page;
-            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsLastPage = page * 10 >= this.Service.Context.Projects.Count();
             ViewBag.IsFirstPage = true;
 
-            IEnumerable<Project> p = await this.service.GetProjectsToListAsync(filter, page);
-            IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
+            IEnumerable<Project> p = await this.Service.GetProjectsToListAsync(filter, page);
+            IEnumerable<ProjectAdminVm> vm = this.Service.MapToProjectsAdminVm(p);
 
             return View(vm);
         }
 
         [ValidateInput(false)]
-        [RequestQuerySerializer]
         public async Task<ActionResult> Filter(string filter = "", int page = 1)
         {
             ViewBag.CurrentPage = page;
-            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsLastPage = page * 10 >= this.Service.Context.Projects.Count();
             ViewBag.IsFirstPage = true;
 
-            IEnumerable<Project> p = await this.service.GetProjectsToListAsync(filter, page);
-            IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
+            IEnumerable<Project> p = await this.Service.GetProjectsToListAsync(filter, page);
+            IEnumerable<ProjectAdminVm> vm = this.Service.MapToProjectsAdminVm(p);
 
             return PartialView("ProjectsPartial", vm);
         }
@@ -64,11 +61,11 @@ namespace WebTasks.Areas.Admin.Controllers
         public async Task<ActionResult> Page(int page)
         {
             ViewBag.CurrentPage = page;
-            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsLastPage = page * 10 >= this.Service.Context.Projects.Count();
             ViewBag.IsFirstPage = page == 1;
 
-            IEnumerable<Project> p = await this.service.GetProjectsToListAsync("", page);
-            IEnumerable<ProjectAdminVm> vm = this.service.MapToProjectsAdminVm(p);
+            IEnumerable<Project> p = await this.Service.GetProjectsToListAsync("", page);
+            IEnumerable<ProjectAdminVm> vm = this.Service.MapToProjectsAdminVm(p);
             
             return PartialView("ProjectsPartial", vm);
         }
@@ -81,7 +78,7 @@ namespace WebTasks.Areas.Admin.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            ProjectDetailedAdminVm vm = await this.service.GetProjectDetailedAdminVm(id);
+            ProjectDetailedAdminVm vm = await this.Service.GetProjectDetailedAdminVm(id);
 
             if (vm == null)
             {
@@ -101,26 +98,29 @@ namespace WebTasks.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public async Task<ActionResult> Create([Bind(Include = "ReleaseDate,Plan,Title,Description")] ProjectBm bm)
         {
             if (ModelState.IsValid)
             {
-                await this.service.AddAsync(bm, this._userManager.FindById(this.User.Identity.GetUserId()));
+                // returns id of inserted project
+                int id = await this.Service.CreateAsync(bm, this._userManager.FindById(this.User.Identity.GetUserId()));
                 
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { id = id });
             }
 
             return View(bm);
         }
 
         // GET: Admin/Projects/Edit/5
+
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await this.service.FindAsync(id);
+            Project project = await this.Service.FindAsync(id);
 
             if (project == null)
             {
@@ -134,6 +134,7 @@ namespace WebTasks.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Description,Title,EditedReleaseDate")] ProjectBm bm)
         {
             if (!ModelState.IsValid)
@@ -141,7 +142,7 @@ namespace WebTasks.Areas.Admin.Controllers
                 return View(bm);
             }
 
-            await this.service.Edit(bm);
+            await this.Service.Edit(bm);
             return RedirectToAction("Details", new { id = bm.Id });
 
         }
@@ -153,8 +154,8 @@ namespace WebTasks.Areas.Admin.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await this.service.FindAsync(id);
-            ProjectAdminVm vm = this.service.MapToProjectAdminVm(project);
+            Project project = await this.Service.FindAsync(id);
+            ProjectAdminVm vm = this.Service.MapToProjectAdminVm(project);
 
             if (project == null)
             {
@@ -168,8 +169,8 @@ namespace WebTasks.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Project project = await this.service.FindAsync(id);
-            await this.service.RemoveAsync(project);
+            Project project = await this.Service.FindAsync(id);
+            await this.Service.RemoveAsync(project);
             return RedirectToAction("Index");
         }
     }

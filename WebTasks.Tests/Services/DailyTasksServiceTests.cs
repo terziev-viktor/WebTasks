@@ -56,7 +56,7 @@ namespace WebTasks.Tests.Services
             };
 
             // act
-            this.service.CreateFromBm(bm, UserA);
+            this.service.Create(bm, UserA);
 
             // assert
             Assert.AreEqual(this.context.DailyTasks.Count(), exprectedCommentsCountAfterCreate);

@@ -3,14 +3,12 @@ using System.Net;
 using System.Web.Mvc;
 using WebTasks.Models.EntityModels;
 using WebTasks.Models.BindingModels;
-using WebTasks.Services;
 using WebTasks.Models.ViewModels;
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using WebTasks.Services.Interfaces;
 using Microsoft.AspNet.Identity.EntityFramework;
 using WebTasks.Models;
-using WebTasks.Filters;
 using WebTasks.Helpers;
 using WebTasks.Areas.User.Models.ViewModels;
 using System.Linq;
@@ -20,25 +18,34 @@ namespace WebTasks.Areas.User.Controllers
     [Authorize]
     public class DailyTasksController : Controller
     {
-        private readonly IDailyTasksService service;
+        public IDailyTasksService Service; // set as public for unit test purposes
+
         private ApplicationUserManager _userManager;
+
+        // an empty constructor for unit test purposes
+        public DailyTasksController()
+        {
+
+        }
 
         public DailyTasksController(IDailyTasksService sr)
         {
-            this.service = sr;
-            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.service.Context as ApplicationDbContext));
+            this.Service = sr;
+            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.Service.Context as ApplicationDbContext));
 
         }
 
         // GET: User/DailyTasks
         public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
+            // page number is passed to the method and updated in the view so that every
+            // time new number will be passed
             ViewBag.CurrentPage = page;
-            ViewBag.IsLastPage = page * 10 >= this.service.Context.DailyTasks.Count();
+            ViewBag.IsLastPage = page * 10 >= this.Service.Context.DailyTasks.Count();
             ViewBag.IsFirstPage = page == 1;
 
             ViewBag.Header = "Your daily tasks";
-            IEnumerable<DailyTaskVm> tasksVm = await this.service.GetUserDailyTasksVm(filter, page, this._userManager.FindById(this.User.Identity.GetUserId()));
+            IEnumerable<DailyTaskVm> tasksVm = await this.Service.GetUserDailyTasksVm(filter, page, this._userManager.FindById(this.User.Identity.GetUserId()));
             return View(tasksVm);
         }
 
@@ -46,12 +53,13 @@ namespace WebTasks.Areas.User.Controllers
         [ValidateInput(false)]
         public async Task<ActionResult> Filter(string filter = "", int page = 1)
         {
+            // page number is passed to the method and updated in the view so that every
+            // time new number will be passed
             ViewBag.CurrentPage = page;
             ViewBag.IsFirstPage = page == 1;
-            ViewBag.IsLastPage = page * 10 >= this.service.Context.DailyTasks.Count();
-
-            string encoded = HtmlSerializer.ToHtmlString(filter);
-            IEnumerable<DailyTaskVm> tasksVm = await this.service.GetUserDailyTasksVm(encoded, page, this._userManager.FindById(this.User.Identity.GetUserId()));
+            ViewBag.IsLastPage = page * 10 >= this.Service.Context.DailyTasks.Count();
+            
+            IEnumerable<DailyTaskVm> tasksVm = await this.Service.GetUserDailyTasksVm(filter, page, this._userManager.FindById(this.User.Identity.GetUserId()));
 
             return PartialView("DailyTasksPartial", tasksVm);
         }
@@ -64,8 +72,8 @@ namespace WebTasks.Areas.User.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.IsFirstPage = page == 1;
 
-            IEnumerable<DailyTaskVm> vm = await this.service.GetUserDailyTasksVm("", page, this._userManager.FindById(this.User.Identity.GetUserId()));
-            ViewBag.IsLastPage = page * 10 >= this.service.GetUserDailyTasksCount(this.User.Identity.GetUserId());
+            IEnumerable<DailyTaskVm> vm = await this.Service.GetUserDailyTasksVm("", page, this._userManager.FindById(this.User.Identity.GetUserId()));
+            ViewBag.IsLastPage = page * 10 >= this.Service.GetUserDailyTasksCount(this.User.Identity.GetUserId());
 
             return PartialView("DailyTasksPartial", vm);
         }
@@ -79,7 +87,7 @@ namespace WebTasks.Areas.User.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            DailyTaskDetailedUserVm vm = this.service.GetDetailedDailyTaskVm(id);
+            DailyTaskDetailedUserVm vm = this.Service.GetDetailedDailyTaskVm(id);
             
             if (vm == null)
             {
@@ -96,14 +104,17 @@ namespace WebTasks.Areas.User.Controllers
         }
 
         // POST: User/DailyTasks/Create
+        // Disable validateinput so the service can serialize the input. This way the user can post
+        // input that is HTML
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public async Task<ActionResult> Create([Bind(Include = "Note,Deadline,Title,Description")] DailyTaskBm bm)
         {
             if (ModelState.IsValid)
             {
-                await this.service.CreateFromBm(bm, this._userManager.FindById(this.User.Identity.GetUserId()));
-                return RedirectToAction("Index");
+                int id = await this.Service.Create(bm, this._userManager.FindById(this.User.Identity.GetUserId()));
+                return RedirectToAction("Details", new { id = id });
             }
 
             return View(bm);
@@ -117,7 +128,7 @@ namespace WebTasks.Areas.User.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            DailyTask dailyTask = await this.service.FindByIdAsync(id);
+            DailyTask dailyTask = await this.Service.FindByIdAsync(id);
             // Only the creator and admins can edit the task
             if(dailyTask.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
             {
@@ -132,20 +143,23 @@ namespace WebTasks.Areas.User.Controllers
         }
 
         // POST: User/DailyTasks/Edit/5
+        // Disable validateinput so the service can serialize the input. This way the user can post
+        // input that is HTML
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Note,Deadline,Title,Description,EditedDeadline")] DailyTaskBm bm)
         {
-            if(!this.service.IsOwner(bm.Id, this._userManager.FindById(this.User.Identity.GetUserId())) && !this.User.IsInRole("Admin"))
+            if(!this.Service.IsOwner(bm.Id, this._userManager.FindById(this.User.Identity.GetUserId())) && !this.User.IsInRole("Admin"))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
             if (ModelState.IsValid)
             {
-                await this.service.Edit(bm);
+                await this.Service.Edit(bm);
                 return RedirectToAction("Details", new { id = bm.Id});
             }
-            return View(this.service.Map(bm));
+            return View(this.Service.Map(bm));
         }
 
         // GET: User/DailyTasks/Delete/5
@@ -155,7 +169,7 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            DailyTask dailyTask = await this.service.FindByIdAsync(id);
+            DailyTask dailyTask = await this.Service.FindByIdAsync(id);
             if (dailyTask.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
@@ -172,8 +186,8 @@ namespace WebTasks.Areas.User.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            DailyTask dailyTask = await this.service.FindByIdAsync(id);
-            await this.service.Remove(dailyTask);
+            DailyTask dailyTask = await this.Service.FindByIdAsync(id);
+            await this.Service.Remove(dailyTask);
             return RedirectToAction("Index");
         }
     }

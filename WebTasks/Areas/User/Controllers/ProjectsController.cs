@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using WebTasks.Services.Interfaces;
 using Microsoft.AspNet.Identity.EntityFramework;
 using WebTasks.Models;
-using WebTasks.Filters;
 using WebTasks.Helpers;
 using System.Linq;
 
@@ -19,13 +18,17 @@ namespace WebTasks.Areas.User.Controllers
     [Authorize]
     public class ProjectsController : Controller
     {
-        private IProjectsService service;
+        public IProjectsService Service;
         private ApplicationUserManager _userManager;
+
+        // An empty constructor for unit test purposes
+        public ProjectsController()
+        {   }
 
         public ProjectsController(IProjectsService s)
         {
-            this.service = s;
-            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.service.Context as ApplicationDbContext));
+            this.Service = s;
+            this._userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(this.Service.Context as ApplicationDbContext));
 
         }
 
@@ -35,10 +38,10 @@ namespace WebTasks.Areas.User.Controllers
         public async Task<ActionResult> Index(string filter = "", int page = 1)
         {
             ViewBag.CurrentPage = page;
-            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsLastPage = page * 10 >= this.Service.Context.Projects.Count();
             ViewBag.IsFirstPage = true;
 
-            return View(await this.service.GetUserProjectsToList(filter, page, this._userManager.FindById(this.User.Identity.GetUserId())));
+            return View(await this.Service.GetUserProjectsToList(filter, page, this._userManager.FindById(this.User.Identity.GetUserId())));
         }
 
         [HttpGet]
@@ -46,12 +49,10 @@ namespace WebTasks.Areas.User.Controllers
         public async Task<ActionResult> Filter(string filter = "", int page = 1)
         {
             ViewBag.CurrentPage = page;
-            ViewBag.IsLastPage = page * 10 >= this.service.Context.Projects.Count();
+            ViewBag.IsLastPage = page * 10 >= this.Service.Context.Projects.Count();
             ViewBag.IsFirstPage = true;
-
-            string encoded = HtmlSerializer.ToHtmlString(filter);
-
-            return PartialView("ProjectsPartial", await this.service.GetUserProjectsToList(encoded, page, this._userManager.FindById(this.User.Identity.GetUserId())));
+            
+            return PartialView("ProjectsPartial", await this.Service.GetUserProjectsToList(filter, page, this._userManager.FindById(this.User.Identity.GetUserId())));
         }
 
         // User/DailyTasks/Page/5
@@ -62,8 +63,8 @@ namespace WebTasks.Areas.User.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.IsFirstPage = page == 1;
 
-            IEnumerable<ProjectVm> vm = await this.service.GetUserProjectsToList("", page, this._userManager.FindById(this.User.Identity.GetUserId()));
-            ViewBag.IsLastPage = page * 10 >= this.service.GetUserProjectsCount(this.User.Identity.GetUserId());
+            IEnumerable<ProjectVm> vm = await this.Service.GetUserProjectsToList("", page, this._userManager.FindById(this.User.Identity.GetUserId()));
+            ViewBag.IsLastPage = page * 10 >= this.Service.GetUserProjectsCount(this.User.Identity.GetUserId());
 
             return PartialView("ProjectsPartial", vm);
         }
@@ -75,14 +76,14 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project p = await this.service.FindAsync(id);
+            Project p = await this.Service.FindAsync(id);
 
             if (p == null)
             {
                 return HttpNotFound();
             }
 
-            ProjectDetailedUserVm vm = this.service.GetDetailedVm(p);
+            ProjectDetailedUserVm vm = this.Service.GetDetailedVm(p);
 
             return View(vm);
         }
@@ -94,14 +95,18 @@ namespace WebTasks.Areas.User.Controllers
         }
 
         // POST: User/Projects/Create
+        // Disable validateinput so the service can serialize the input. This way the user can post
+        // input that is HTML
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public async Task<ActionResult> Create([Bind(Include = "ReleaseDate,Title")] ProjectBm bm)
         {
             if (ModelState.IsValid)
             {
-                await this.service.AddAsync(bm, this._userManager.FindById(this.User.Identity.GetUserId()));
-                return RedirectToAction("Index");
+                // id of inserted object
+                int id = await this.Service.CreateAsync(bm, this._userManager.FindById(this.User.Identity.GetUserId()));
+                return RedirectToAction("Details", new { id = id });
             }
 
             return View(bm);
@@ -114,7 +119,7 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = await service.FindAsync(id);
+            Project project = await Service.FindAsync(id);
 
             if (project == null)
             {
@@ -129,8 +134,11 @@ namespace WebTasks.Areas.User.Controllers
         }
 
         // POST: User/Projects/Edit/5
+        // Disable validateinput so the service can serialize the input. This way the user can post
+        // input that is HTML
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public async System.Threading.Tasks.Task<ActionResult> Edit([Bind(Include = "Id,ReleaseDate,Plan,Description,Title,EditedReleaseDate")] ProjectBm bm)
         {
             
@@ -139,13 +147,13 @@ namespace WebTasks.Areas.User.Controllers
                 return View(bm);
             }
 
-            Project p = await this.service.FindAsync(bm.Id);
+            Project p = await this.Service.FindAsync(bm.Id);
 
-            if(p.Creator.Id != this.User.Identity.GetUserId() && this.User.IsInRole("Admin"))
+            if(p.Creator.Id != this.User.Identity.GetUserId() && !this.User.IsInRole("Admin"))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
             }
-            await this.service.Edit(bm);
+            await this.Service.Edit(bm);
             return RedirectToAction("Details", new { id = bm.Id });
             
         }
@@ -157,7 +165,7 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project p = await this.service.FindAsync(id);
+            Project p = await this.Service.FindAsync(id);
             if (p == null)
             {
                 return HttpNotFound();
@@ -166,7 +174,7 @@ namespace WebTasks.Areas.User.Controllers
             {
                 return new HttpUnauthorizedResult();
             }
-            ProjectVm vm = this.service.GetProjectVm(p);
+            ProjectVm vm = this.Service.GetProjectVm(p);
 
             return View(vm);
         }
@@ -176,12 +184,12 @@ namespace WebTasks.Areas.User.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Project project = await this.service.FindAsync(id);
+            Project project = await this.Service.FindAsync(id);
             if(project == null)
             {
                 return HttpNotFound();
             }
-            await this.service.RemoveAsync(project);
+            await this.Service.RemoveAsync(project);
             return RedirectToAction("Index");
         }
     }

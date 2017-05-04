@@ -6,7 +6,7 @@
 
 <h2>All Daily Tasks in the application</h2>
 
-@using (Ajax.BeginForm("Filter", "DailyTasks", new { filter = "", page = 1 }, new AjaxOptions
+@using (Ajax.BeginForm("Filter", "DailyTasks", new { page = 1 }, new AjaxOptions
 {
     HttpMethod = "GET",
     InsertionMode = InsertionMode.Replace, //target element(#patientList) will be replaced

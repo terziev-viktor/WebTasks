@@ -23,7 +23,7 @@ namespace WebTasks.Services.Interfaces
 
         DailyTaskDetailedUserVm GetDetailedDailyTaskVm(int? id);
 
-        Task<int> CreateFromBm(DailyTaskBm bm, ApplicationUser creator);
+        Task<int> Create(DailyTaskBm bm, ApplicationUser creator);
 
         bool IsOwner(int id, ApplicationUser user);
 

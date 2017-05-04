@@ -156,7 +156,7 @@ namespace WebTasks.Tests.Services
             };
 
             // act
-            this.service.AddAsync(bm, UserA);
+            this.service.CreateAsync(bm, UserA);
 
             // assert
             Assert.IsNotNull(this.service.Context.Projects.Find(projectId));

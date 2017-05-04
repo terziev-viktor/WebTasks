@@ -8,11 +8,11 @@ using WebTasks.Areas.User.Models.ViewModels;
 using WebTasks.Models.BindingModels;
 using WebTasks.Models.ViewModels;
 using WebTasks.Areas.Admin.Models.ViewModels;
-using Microsoft.AspNet.Identity;
 using WebTasks.Models.Interfaces;
 using WebTasks.Models;
 using WebTasks.Services.Interfaces;
 using System;
+using WebTasks.Helpers;
 
 namespace WebTasks.Services
 {
@@ -31,6 +31,7 @@ namespace WebTasks.Services
 
         public async Task<IEnumerable<ProjectVm>> GetUserProjectsToList(string filter, int page, ApplicationUser user)
         {
+            filter = HtmlSerializer.ToHtmlString(filter);
             var a = await this.Context.Projects.Where(x => x.Creator.Id == user.Id && x.Title.Contains(filter))
                 .OrderByDescending(x => x.Id)
                 .Skip((page-1)*PageSize).Take(PageSize).ToListAsync();
@@ -58,18 +59,24 @@ namespace WebTasks.Services
 
         public async Task<IEnumerable<Project>> GetProjectsToListAsync(string filter, int page)
         {
+            filter = HtmlSerializer.ToHtmlString(filter);
             return await this.Context.Projects
                 .Where(x => x.Title.Contains(filter))
                 .OrderByDescending(x => x.Id)
                 .Skip((page - 1) * PageSize).Take(PageSize).ToListAsync();
         }
 
-        public async System.Threading.Tasks.Task AddAsync(ProjectBm bm, ApplicationUser creator)
+        public async System.Threading.Tasks.Task<int> CreateAsync(ProjectBm bm, ApplicationUser creator)
         {
+            bm.Description = HtmlSerializer.ToHtmlString(bm.Description);
+            bm.Plan = HtmlSerializer.ToHtmlString(bm.Plan);
+            bm.Title = HtmlSerializer.ToHtmlString(bm.Title);
+
             Project p = Mapper.Map<Project>(bm);
             p.Creator = creator;
             this.Context.Projects.Add(p);
             await this.Context.SaveChangesAsync();
+            return p.Id;
         }
 
         public ProjectAdminVm MapToProjectAdminVm(Project project)
@@ -101,6 +108,10 @@ namespace WebTasks.Services
 
         public async System.Threading.Tasks.Task Edit(ProjectBm bm)
         {
+            bm.Description = HtmlSerializer.ToHtmlString(bm.Description);
+            bm.Plan = HtmlSerializer.ToHtmlString(bm.Plan);
+            bm.Title = HtmlSerializer.ToHtmlString(bm.Title);
+
             Project p = await this.FindAsync(bm.Id);
             p.Plan = bm.Plan;
             p.Description = bm.Description;

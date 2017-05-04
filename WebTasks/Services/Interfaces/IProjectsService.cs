@@ -22,7 +22,7 @@ namespace WebTasks.Services.Interfaces
 
         System.Threading.Tasks.Task<IEnumerable<Project>> GetProjectsToListAsync(string filter, int page);
 
-        System.Threading.Tasks.Task AddAsync(ProjectBm bm, ApplicationUser creator);
+        System.Threading.Tasks.Task<int> CreateAsync(ProjectBm bm, ApplicationUser creator);
 
         ProjectAdminVm MapToProjectAdminVm(Project project);
 

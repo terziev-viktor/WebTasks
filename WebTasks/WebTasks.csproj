@@ -229,6 +229,7 @@
     <Compile Include="Areas\User\Controllers\ProjectsController.cs" />
     <Compile Include="Areas\User\Models\ViewModels\DailyTaskDetailedUserVm.cs" />
     <Compile Include="Areas\User\Models\ViewModels\PersonDetailedVm.cs" />
+    <Compile Include="Controllers\ErrorsController.cs" />
     <Compile Include="Filters\RequestQuerySerializerAttribute.cs" />
     <Compile Include="Helpers\HtmlSerializer.cs" />
     <Compile Include="Mocks\MockedCommentsDbSet.cs" />
@@ -415,6 +416,9 @@
     <Content Include="Views\Shared\PotentialXSS.cshtml" />
     <Content Include="Views\Shared\PaginationPartial.cshtml" />
     <Content Include="Views\Comments\Index.cshtml" />
+    <Content Include="Views\Errors\General.cshtml" />
+    <Content Include="Views\Errors\Http403.cshtml" />
+    <Content Include="Views\Errors\Http404.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Projects\" />
