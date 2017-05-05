@@ -39,7 +39,7 @@ namespace WebTasks.Areas.User.Controllers
             ViewBag.IsFirstPage = page == 1;
             ViewBag.IsLastPage = page * 10 >= this._userManager.Users.Count();
 
-            string encoded = HtmlSerializer.ToHtmlString(filter);
+            string encoded = HtmlSerializer.ToEncodedString(filter);
             IEnumerable<PersonVm> vm = await this.service.GetAllUsersAsync(encoded, page);
             return View(vm);
         }
@@ -52,7 +52,7 @@ namespace WebTasks.Areas.User.Controllers
             ViewBag.IsFirstPage = page == 1;
             ViewBag.IsLastPage = page * 10 >= this._userManager.Users.Count();
 
-            string encoded = HtmlSerializer.ToHtmlString(filter);
+            string encoded = HtmlSerializer.ToEncodedString(filter);
             
             IEnumerable<PersonVm> vm = await this.service.GetAllUsersAsync(encoded);
             return PartialView("PeoplePartial", vm);

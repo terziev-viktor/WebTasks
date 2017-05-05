@@ -2,10 +2,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -25,8 +23,7 @@ namespace WebTasks.Tests.Controllers.User
         private Mock<IPrincipal> userMock;
         private Mock<HttpContextBase> contextMock;
         private Mock<ControllerContext> controllerContextMock;
-
-
+        
         [TestInitialize]
         public void Init()
         {
@@ -54,6 +51,7 @@ namespace WebTasks.Tests.Controllers.User
         {
             // arrange
             int id = 1;
+            string uid = "asdfasfsa";
             var project = new Project()
             {
                 Description = "desc",
@@ -64,9 +62,11 @@ namespace WebTasks.Tests.Controllers.User
                 ReleaseDate = DateTime.Now
             };
             var vm = new ProjectDetailedUserVm();
-
+            var identityMock = new Mock<IIdentity>();
+            identityMock.Setup(x => x.GetUserId()).Returns(uid);
+            userMock.SetupGet(x => x.Identity).Returns(identityMock.Object);
             serviceMock.Setup(x => x.FindAsync(id)).Returns(new Task<Project>(() => project));
-            serviceMock.Setup(x => x.GetDetailedVm(It.IsAny<Project>())).Returns(vm);
+            serviceMock.Setup(x => x.GetDetailedVm(It.IsAny<Project>(), It.IsAny<string>())).Returns(vm);
 
             // act
             var result = controller.Details(id);

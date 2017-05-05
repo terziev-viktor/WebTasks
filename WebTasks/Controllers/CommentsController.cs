@@ -52,7 +52,7 @@ namespace WebTasks.Controllers
             {
                 return new HttpStatusCodeResult(403);
             }
-            string contentHtmlEncoded = HtmlSerializer.ToHtmlString(Content);
+            string contentHtmlEncoded = HtmlSerializer.ToEncodedString(Content);
             if (contentHtmlEncoded.Length == 0)
             {
                 return new HttpStatusCodeResult(403);

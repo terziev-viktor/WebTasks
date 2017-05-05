@@ -1,17 +1,17 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using WebTasks.Helpers;
 
 namespace WebTasks.Areas.Admin.Models.ViewModels
 {
     public class DailyTaskAdminVm
     {
-        [Required]
+        private string _title;
+        private string _note;
+
         public int Id { get; set; }
 
-        [StringLength(20, MinimumLength = 1, ErrorMessage = "The task must have a title")]
-        public string Title { get; set; }
+        public string Title { get { return HtmlSerializer.ToDecodedString(_title); } set { _title = value; } }
 
-        public string Note { get; set; }
+        public string Note { get { return HtmlSerializer.ToDecodedString(_note); } set { _note = value; } }
 
         public int CommentsCount { get; set; }
         

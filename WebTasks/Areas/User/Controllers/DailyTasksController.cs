@@ -87,7 +87,7 @@ namespace WebTasks.Areas.User.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            DailyTaskDetailedUserVm vm = this.Service.GetDetailedDailyTaskVm(id);
+            DailyTaskDetailedUserVm vm = this.Service.GetDetailedDailyTaskVm(id, this.User.Identity.GetUserId());
             
             if (vm == null)
             {

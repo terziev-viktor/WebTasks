@@ -53,5 +53,4 @@
 
 function clearTxtArea() {
     $('#txtarea-comment').val('');
-    console.log('clicked');
 }

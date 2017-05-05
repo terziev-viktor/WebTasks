@@ -33,9 +33,21 @@ namespace WebTasks.Migrations
                 Email = "user@user.net",
                 UserName = "user@user.net"
             };
+            var anothernewUser = new ApplicationUser()
+            {
+                Email = "user1@user.net",
+                UserName = "user1@user.net"
+            };
+            var othernewUser = new ApplicationUser()
+            {
+                Email = "user2@user.net",
+                UserName = "user2@user.net"
+            };
 
             var adminCreated = userManager.Create(newAdmin, "S!mepass12345");
             var userCreated = userManager.Create(newUser, "S!mepass12345");
+            var anotheruserCreated = userManager.Create(anothernewUser, "S!mepass12345");
+            var otheruserCreated = userManager.Create(othernewUser, "S!mepass12345");
 
             if (!roleManager.Roles.Any())
             {
@@ -48,6 +60,12 @@ namespace WebTasks.Migrations
 
             var userU = userManager.Users.FirstOrDefault(x => x.Email == "user@user.net");
             userManager.AddToRole(userU.Id, "User");
+
+            var anotheruserU = userManager.Users.FirstOrDefault(x => x.Email == "user1@user.net");
+            userManager.AddToRole(anotheruserU.Id, "User");
+
+            var otheruserU = userManager.Users.FirstOrDefault(x => x.Email == "user2@user.net");
+            userManager.AddToRole(otheruserU.Id, "User");
 
             var dtask1 = new Models.EntityModels.DailyTask()
             {

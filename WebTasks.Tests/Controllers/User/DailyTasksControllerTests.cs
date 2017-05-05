@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using System.Linq;
 using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
@@ -59,7 +59,8 @@ namespace WebTasks.Tests.Controllers.User
                 Title = randomStr
             };
 
-            serviceMock.Setup(x => x.GetDetailedDailyTaskVm(It.IsAny<int>()))
+            userMock.Setup(x => x.Identity.GetUserId()).Returns(randomStr);
+            serviceMock.Setup(x => x.GetDetailedDailyTaskVm(It.IsAny<int>(), It.IsAny<string>()))
                 .Returns(model);
 
             // act

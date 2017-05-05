@@ -151,8 +151,9 @@ namespace WebTasks.Tests.Services
         {
             int id = 1;
             DailyTask expected = this.service.Context.DailyTasks.First();
+            string uId = expected.Creator.Id;
 
-            DailyTaskDetailedUserVm result = this.service.GetDetailedDailyTaskVm(id);
+            DailyTaskDetailedUserVm result = this.service.GetDetailedDailyTaskVm(id, expected.Creator.Id);
 
             Assert.IsInstanceOfType(result, typeof(DailyTaskDetailedUserVm));
             Assert.AreEqual(expected.Id, result.Id);

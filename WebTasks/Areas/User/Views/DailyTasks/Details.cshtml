@@ -51,6 +51,10 @@
 </div>
 <p>
     @Html.ActionLink("Back to List", "Index")
+    @if (Model.IsOwner == true)
+    {
+        <span> | </span>@Html.ActionLink("Edit", "Edit", new { id = Model.Id })
+    }
 </p>
 
 <h3>Comments</h3>

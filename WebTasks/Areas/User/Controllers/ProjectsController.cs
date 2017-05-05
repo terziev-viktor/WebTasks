@@ -83,7 +83,7 @@ namespace WebTasks.Areas.User.Controllers
                 return HttpNotFound();
             }
 
-            ProjectDetailedUserVm vm = this.Service.GetDetailedVm(p);
+            ProjectDetailedUserVm vm = this.Service.GetDetailedVm(p, this.User.Identity.GetUserId());
 
             return View(vm);
         }

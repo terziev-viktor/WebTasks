@@ -30,7 +30,7 @@ namespace WebTasks.Services.Interfaces
 
         System.Threading.Tasks.Task<Project> FindAsync(int? id);
 
-        ProjectDetailedUserVm GetDetailedVm(Project p);
+        ProjectDetailedUserVm GetDetailedVm(Project p, string currentUserId);
 
         ProjectVm GetProjectVm(Project project);
 

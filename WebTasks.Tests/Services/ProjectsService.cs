@@ -56,9 +56,9 @@ namespace WebTasks.Tests.Services
         {
             // arrange
             var project = this.context.Projects.First();
-
+            var uid = project.Creator.Id;
             // act
-            var result = this.service.GetDetailedVm(project);
+            var result = this.service.GetDetailedVm(project, uid);
 
             // assert
             Assert.IsInstanceOfType(result, typeof(ProjectDetailedUserVm));

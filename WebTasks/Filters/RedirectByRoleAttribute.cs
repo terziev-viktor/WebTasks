@@ -28,7 +28,6 @@ namespace WebTasks.Filters
 
         public override Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {
-            
             if (!HttpContext.Current.User.Identity.IsAuthenticated)
             {
                 return null;

@@ -55,7 +55,7 @@ namespace WebTasks.Areas.Admin.Controllers
             ViewBag.IsFirstPage = true;
             ViewBag.IsLastPage = page * 10 >= this.Service.Context.DailyTasks.Count();
 
-            string encodedFilter = HtmlSerializer.ToHtmlString(filter);
+            string encodedFilter = HtmlSerializer.ToEncodedString(filter);
             IEnumerable<DailyTaskAdminVm> data = await this.Service.GetAllDailyTaskVm(encodedFilter, page);
             return PartialView("DailyTasksPartial", data);
         }

@@ -46,7 +46,7 @@ namespace WebTasks.Services
 
         public async Task<IEnumerable<DailyTaskVm>> GetUserDailyTasksVm(string filter, int page, ApplicationUser currentUser)
         {
-            filter = HtmlSerializer.ToHtmlString(filter);
+            filter = HtmlSerializer.ToEncodedString(filter);
             var tasks = await this.Context.DailyTasks.Where(x => x.Creator.Id == currentUser.Id && x.Title.Contains(filter)).ToListAsync();
             IEnumerable<DailyTaskVm> tasksVm = Mapper.Instance.Map<IEnumerable<DailyTask>, IEnumerable<DailyTaskVm>>(tasks)
                 .OrderByDescending(x => x.Id)
@@ -67,7 +67,7 @@ namespace WebTasks.Services
             return this.Context.DailyTasks.Find(id);
         }
         
-        public DailyTaskDetailedUserVm GetDetailedDailyTaskVm(int? id)
+        public DailyTaskDetailedUserVm GetDetailedDailyTaskVm(int? id, string currentUserId)
         {
             DailyTask dailyTask = this.Context.DailyTasks.Find(id);
             
@@ -78,14 +78,15 @@ namespace WebTasks.Services
 
             DailyTaskDetailedUserVm vm = Mapper.Map<DailyTaskDetailedUserVm>(dailyTask);
             vm.Comments = vm.Comments.OrderBy(x => x.PublishDate).ToList();
+            vm.IsOwner = dailyTask.Creator.Id == currentUserId;
             return vm;
         }
 
         public async System.Threading.Tasks.Task<int> Create(DailyTaskBm bm, ApplicationUser creator)
         {
-            bm.Description = HtmlSerializer.ToHtmlString(bm.Description);
-            bm.Note = HtmlSerializer.ToHtmlString(bm.Note);
-            bm.Title = HtmlSerializer.ToHtmlString(bm.Title);
+            bm.Description = HtmlSerializer.ToEncodedString(bm.Description);
+            bm.Note = HtmlSerializer.ToEncodedString(bm.Note);
+            bm.Title = HtmlSerializer.ToEncodedString(bm.Title);
             var dailyTask = Mapper.Instance.Map<DailyTaskBm, DailyTask>(bm);
             dailyTask.Creator = creator;
             this.Context.DailyTasks.Add(dailyTask);
@@ -111,9 +112,9 @@ namespace WebTasks.Services
 
         public async System.Threading.Tasks.Task Edit(DailyTaskBm bm)
         {
-            bm.Description = HtmlSerializer.ToHtmlString(bm.Description);
-            bm.Title = HtmlSerializer.ToHtmlString(bm.Title);
-            bm.Note = HtmlSerializer.ToHtmlString(bm.Note);
+            bm.Description = HtmlSerializer.ToEncodedString(bm.Description);
+            bm.Title = HtmlSerializer.ToEncodedString(bm.Title);
+            bm.Note = HtmlSerializer.ToEncodedString(bm.Note);
 
             DailyTask dt = await this.Context.DailyTasks.FindAsync(bm.Id);
             dt.Title = bm.Title;

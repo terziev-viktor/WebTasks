@@ -1,16 +1,26 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web;
 
 namespace WebTasks.Helpers
 {
     public class HtmlSerializer
     {
-        public static string ToHtmlString(string str)
+        public static string ToEncodedString(string str)
         {
             if (str == null)
             {
                 return str;
             }
-            return MvcHtmlString.Create(str).ToHtmlString().Trim();
+            return HttpContext.Current.Server.HtmlEncode(str).Trim();
+        }
+
+        internal static string ToDecodedString(string str)
+        {
+            if(str == null)
+            {
+                return str;
+            }
+            return HttpContext.Current.Server.HtmlDecode(str).Trim();
         }
     }
 }

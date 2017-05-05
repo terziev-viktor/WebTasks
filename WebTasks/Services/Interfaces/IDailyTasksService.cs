@@ -21,7 +21,7 @@ namespace WebTasks.Services.Interfaces
 
         DailyTask FindById(int? id);
 
-        DailyTaskDetailedUserVm GetDetailedDailyTaskVm(int? id);
+        DailyTaskDetailedUserVm GetDetailedDailyTaskVm(int? id, string currentUserId);
 
         Task<int> Create(DailyTaskBm bm, ApplicationUser creator);
 

@@ -31,7 +31,7 @@ namespace WebTasks.Services
 
         public async Task<IEnumerable<ProjectVm>> GetUserProjectsToList(string filter, int page, ApplicationUser user)
         {
-            filter = HtmlSerializer.ToHtmlString(filter);
+            filter = HtmlSerializer.ToEncodedString(filter);
             var a = await this.Context.Projects.Where(x => x.Creator.Id == user.Id && x.Title.Contains(filter))
                 .OrderByDescending(x => x.Id)
                 .Skip((page-1)*PageSize).Take(PageSize).ToListAsync();
@@ -59,7 +59,7 @@ namespace WebTasks.Services
 
         public async Task<IEnumerable<Project>> GetProjectsToListAsync(string filter, int page)
         {
-            filter = HtmlSerializer.ToHtmlString(filter);
+            filter = HtmlSerializer.ToEncodedString(filter);
             return await this.Context.Projects
                 .Where(x => x.Title.Contains(filter))
                 .OrderByDescending(x => x.Id)
@@ -68,9 +68,9 @@ namespace WebTasks.Services
 
         public async System.Threading.Tasks.Task<int> CreateAsync(ProjectBm bm, ApplicationUser creator)
         {
-            bm.Description = HtmlSerializer.ToHtmlString(bm.Description);
-            bm.Plan = HtmlSerializer.ToHtmlString(bm.Plan);
-            bm.Title = HtmlSerializer.ToHtmlString(bm.Title);
+            bm.Description = HtmlSerializer.ToEncodedString(bm.Description);
+            bm.Plan = HtmlSerializer.ToEncodedString(bm.Plan);
+            bm.Title = HtmlSerializer.ToEncodedString(bm.Title);
 
             Project p = Mapper.Map<Project>(bm);
             p.Creator = creator;
@@ -94,10 +94,11 @@ namespace WebTasks.Services
             return this.Context.Projects.FindAsync(id);
         }
 
-        public ProjectDetailedUserVm GetDetailedVm(Project p)
+        public ProjectDetailedUserVm GetDetailedVm(Project p, string currentUserId)
         {
             ProjectDetailedUserVm vm = Mapper.Map<ProjectDetailedUserVm>(p);
             vm.Comments = vm.Comments.OrderBy(x => x.PublishDate).ToList();
+            vm.IsOwner = p.Creator.Id == currentUserId;
             return vm;
         }
 
@@ -108,9 +109,9 @@ namespace WebTasks.Services
 
         public async System.Threading.Tasks.Task Edit(ProjectBm bm)
         {
-            bm.Description = HtmlSerializer.ToHtmlString(bm.Description);
-            bm.Plan = HtmlSerializer.ToHtmlString(bm.Plan);
-            bm.Title = HtmlSerializer.ToHtmlString(bm.Title);
+            bm.Description = HtmlSerializer.ToEncodedString(bm.Description);
+            bm.Plan = HtmlSerializer.ToEncodedString(bm.Plan);
+            bm.Title = HtmlSerializer.ToEncodedString(bm.Title);
 
             Project p = await this.FindAsync(bm.Id);
             p.Plan = bm.Plan;

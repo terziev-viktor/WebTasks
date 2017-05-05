@@ -7,7 +7,7 @@ namespace WebTasks.Controllers
     {
         public ActionResult General(Exception exception)
         {
-            return View();
+            return View(exception);
         }
 
         public ActionResult Http404()
